@@ -24,12 +24,15 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const isAuthPage = typeof window !== 'undefined' && 
+    (window.location.pathname.includes('/auth/'));
+
   return (
     <html lang="pt" className="dark">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}>
-        <Navbar />
+        {!isAuthPage && <Navbar />}
         {children}
-        <Footer />
+        {!isAuthPage && <Footer />}
       </body>
     </html>
   );

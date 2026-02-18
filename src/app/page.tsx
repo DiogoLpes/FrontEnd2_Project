@@ -87,6 +87,36 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* CTA Section - Login */}
+      <section className="py-20 bg-slate-900 border-t border-slate-800">
+        <div className="container mx-auto px-6 text-center">
+          <h2 className="text-4xl font-black text-white uppercase italic mb-6">
+            Pronto para começar?
+          </h2>
+          <p className="text-slate-400 text-lg mb-10 max-w-2xl mx-auto">
+            Aceda à sua conta TSPneus e acompanhe todos os seus serviços em tempo real.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <Link 
+              href="/auth/login"
+              className="inline-flex items-center justify-center gap-3 h-16 px-10 bg-primary text-black font-black uppercase italic rounded-lg hover:bg-yellow-400 transition-colors"
+            >
+              <span>Entrar</span>
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+            
+            <Link 
+              href="/auth/register"
+              className="inline-flex items-center justify-center gap-3 h-16 px-10 border-2 border-primary text-primary font-black uppercase italic rounded-lg hover:bg-primary hover:text-black transition-colors"
+            >
+              <span>Criar Conta</span>
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

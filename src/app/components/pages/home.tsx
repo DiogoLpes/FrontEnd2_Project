@@ -3,7 +3,7 @@
 import { Clock, ShieldCheck, Wrench, ArrowRight, Star, Settings, History, Fuel, Gauge } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../../components/ui/button";
-import heroImage from "@/assets/hero-image.jpg"; // AJUSTA O CAMINHO CONFORME A TUA PASTA
+import heroImage from "@/assets/hero-image.jpg"; 
 
 export default function Home() {
   return (
