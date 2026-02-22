@@ -1,119 +1,89 @@
 "use client";
 
-import { Clock, ShieldCheck, Wrench, ArrowRight, Star, Settings, History, Fuel, Gauge } from "lucide-react";
-import Link from "next/link";
+import { Wrench, Gauge, ShieldCheck, ChevronRight, Settings } from "lucide-react";
 import { Button } from "./components/ui/button";
-import heroImage from "./assets/hero-image.jpg"; 
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-[#0a0c10]">
+    <div className="min-h-screen bg-garage-dark text-white bg-garage-texture">
       
-      {/* HERO SECTION - INDUSTRIAL DESIGN */}
-      <section className="relative h-screen flex items-center overflow-hidden">
-        {/* Background com efeito de profundidade */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0a0c10] via-[#0a0c10]/80 to-transparent z-10" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0c10] z-10" />
-          <img 
-            src={heroImage.src} 
-            className="w-full h-full object-cover scale-105 animate-pulse-slow" 
-            alt="Oficina"
-          />
-        </div>
+      {/* HERO SECTION - IMPACTO VISUAL */}
+      <section className="relative h-screen flex items-center justify-center overflow-hidden border-b-4 border-garage-blue">
+        {/* Imagem de fundo com overlay pesado para dar profundidade */}
+        <div className="absolute inset-0 opacity-40 bg-[url('https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=2000')] bg-cover bg-center" />
+        <div className="absolute inset-0 bg-gradient-to-t from-garage-dark via-transparent to-garage-dark" />
 
-        <div className="container mx-auto px-6 relative z-20">
-          <div className="max-w-4xl">
-            <div className="flex items-center gap-4 mb-6">
-              <span className="h-[2px] w-12 bg-primary" />
-              <span className="text-primary font-black uppercase tracking-[0.3em] text-sm">Oficina de Alta Performance</span>
+        <div className="container relative z-10 px-6">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 mb-4 px-3 py-1 bg-garage-blue text-xs font-black uppercase tracking-tighter italic">
+              <Settings className="animate-spin-slow" size={14} /> Especialistas em Pneus e Mecânica
             </div>
             
-            <h1 className="text-6xl md:text-9xl font-black text-white leading-[0.85] uppercase italic mb-8 tracking-tighter">
-              TECNOLOGIA <br />
-              <span className="text-transparent stroke-text">DOMINANTE.</span>
+            <h1 className="text-6xl md:text-8xl font-black uppercase italic leading-none tracking-tighter mb-6">
+              TS <span className="text-garage-blue">PNEUS</span> <br />
+              <span className="text-outline">PERFORMANCE</span>
             </h1>
             
-            <p className="text-lg md:text-2xl text-slate-400 mb-12 max-w-2xl font-medium leading-relaxed border-l-4 border-primary pl-6">
-              Não somos apenas uma oficina. Somos o centro tecnológico onde o seu veículo recupera a potência original. Agendamento digital e transparência total.
+            <p className="text-xl text-slate-300 mb-10 max-w-xl font-medium border-l-4 border-garage-blue pl-6">
+              Desde Olhos de Água para a estrada. Tecnologia de ponta, mãos de mestre e a confiança de quem conhece o seu carro.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-6">
-              <Button size="lg" className="h-20 px-12 text-xl font-black uppercase italic tracking-tighter rounded-none bg-primary text-black hover:bg-yellow-500 skew-x-[-12deg]" asChild>
-                <Link href="/agendar" className="flex items-center gap-3">
-                   <span className="skew-x-[12deg]">Agendar Serviço</span>
-                   <ArrowRight className="skew-x-[12deg] w-6 h-6" />
-                </Link>
+            <div className="flex flex-wrap gap-4">
+              <Button size="lg" className="btn-industrial bg-garage-blue hover:bg-blue-700 text-white font-black px-10 h-16 text-xl transition-all hover:scale-105">
+                MARCAR REVISÃO
               </Button>
-              <Button size="lg" variant="outline" className="h-20 px-12 text-xl font-black uppercase italic tracking-tighter rounded-none border-2 border-white text-white hover:bg-white hover:text-black skew-x-[-12deg]" asChild>
-                <Link href="/status">
-                  <span className="skew-x-[12deg]">Rastrear Matrícula</span>
-                </Link>
+              <Button size="lg" variant="outline" className="btn-industrial border-2 border-white font-black px-10 h-16 text-xl hover:bg-white hover:text-black">
+                VER STATUS
               </Button>
             </div>
           </div>
         </div>
-
-        {/* INDICADORES LATERAIS */}
-        <div className="absolute right-10 bottom-20 hidden xl:flex flex-col gap-10">
-          <div className="flex flex-col items-end">
-            <Gauge className="text-primary w-10 h-10 mb-2" />
-            <span className="text-white font-black text-3xl italic tracking-tighter">100%</span>
-            <span className="text-slate-500 text-[10px] uppercase font-bold tracking-widest">Precisão Digital</span>
-          </div>
-          <div className="flex flex-col items-end">
-            <Fuel className="text-primary w-10 h-10 mb-2" />
-            <span className="text-white font-black text-3xl italic tracking-tighter">24H</span>
-            <span className="text-slate-500 text-[10px] uppercase font-bold tracking-widest">Suporte Agendado</span>
-          </div>
+        
+        {/* Indicador de "Scroll" Estilo Industrial */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50">
+          <div className="w-1 h-12 bg-garage-blue rounded-full" />
         </div>
       </section>
 
-      {/* SERVICES GRID - CARDS MAIS TRABALHADOS */}
-      <section className="py-32 relative bg-slate-900">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 border border-slate-800">
-            {[
-              { icon: <Wrench className="w-10 h-10" />, title: "Mecânica Avançada", desc: "Motores, transmissões e sistemas complexos analisados por especialistas." },
-              { icon: <ShieldCheck className="w-10 h-10" />, title: "Segurança Ativa", desc: "Pneus e travões testados sob condições extremas de performance." },
-              { icon: <History className="w-10 h-10" />, title: "Cloud Garagem", desc: "Histórico completo da sua viatura disponível em qualquer lugar." },
-            ].map((s, i) => (
-              <div key={i} className="p-16 border-slate-800 border hover:bg-primary transition-all duration-500 group">
-                <div className="text-primary mb-10 group-hover:text-black transition-colors">{s.icon}</div>
-                <h3 className="text-3xl font-black uppercase italic mb-6 group-hover:text-black transition-colors leading-none">{s.title}</h3>
-                <p className="text-slate-400 group-hover:text-black/80 transition-colors font-medium">{s.desc}</p>
+      {/* SECÇÃO DE SERVIÇOS - CARDS RUGOSOS */}
+      <section className="py-24 container mx-auto px-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
+          {[
+            { icon: <Gauge size={40} />, title: "Pneus & Alinhamento", desc: "Segurança máxima em cada curva com as melhores marcas." },
+            { icon: <Wrench size={40} />, title: "Mecânica Geral", desc: "Diagnóstico completo e reparação especializada." },
+            { icon: <ShieldCheck size={40} />, title: "Check-up Grátis", desc: "Verificamos 25 pontos críticos do seu veículo." }
+          ].map((s, i) => (
+            <div key={i} className="group p-12 bg-slate-900/50 border border-slate-800 hover:bg-garage-blue transition-all duration-500 cursor-default">
+              <div className="text-garage-blue group-hover:text-white mb-6 transition-colors">
+                {s.icon}
               </div>
-            ))}
-          </div>
+              <h3 className="text-2xl font-black uppercase italic mb-4 tracking-tighter">{s.title}</h3>
+              <p className="text-slate-400 group-hover:text-blue-100 transition-colors mb-6 font-medium">
+                {s.desc}
+              </p>
+              <div className="w-12 h-1 bg-garage-blue group-hover:bg-white transition-all" />
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* CTA Section - Login */}
-      <section className="py-20 bg-slate-900 border-t border-slate-800">
-        <div className="container mx-auto px-6 text-center">
-          <h2 className="text-4xl font-black text-white uppercase italic mb-6">
-            Pronto para começar?
-          </h2>
-          <p className="text-slate-400 text-lg mb-10 max-w-2xl mx-auto">
-            Aceda à sua conta TSPneus e acompanhe todos os seus serviços em tempo real.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Link 
-              href="/auth/login"
-              className="inline-flex items-center justify-center gap-3 h-16 px-10 bg-primary text-black font-black uppercase italic rounded-lg hover:bg-yellow-400 transition-colors"
-            >
-              <span>Entrar</span>
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            
-            <Link 
-              href="/auth/register"
-              className="inline-flex items-center justify-center gap-3 h-16 px-10 border-2 border-primary text-primary font-black uppercase italic rounded-lg hover:bg-primary hover:text-black transition-colors"
-            >
-              <span>Criar Conta</span>
-              <ArrowRight className="w-5 h-5" />
-            </Link>
+      {/* INFO RÁPIDA - COMO NO GOOGLE MAPS */}
+      <section className="bg-white text-black py-16">
+        <div className="container mx-auto px-6 flex flex-wrap justify-between items-center gap-12">
+          <div>
+            <h2 className="text-4xl font-black uppercase italic leading-none mb-2">Visite a nossa oficina</h2>
+            <p className="font-bold text-slate-600">Olhos de Água, Faro - Portugal</p>
+          </div>
+          <div className="flex gap-8">
+            <div className="text-center">
+              <p className="text-xs font-black uppercase text-slate-400">Telefone</p>
+              <p className="text-xl font-black">289 360 294</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs font-black uppercase text-slate-400">Horário</p>
+              <p className="text-xl font-black">Seg-Sex: 08:30 - 19:00</p>
+            </div>
           </div>
         </div>
       </section>

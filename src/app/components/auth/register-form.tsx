@@ -1,138 +1,74 @@
 "use client";
 
 import { useState } from "react";
-import { User, Mail, Lock, Phone, ArrowRight } from "lucide-react";
-import { Button } from "@/app/components/ui/button";
+import { ArrowRight, Loader2, Gauge } from "lucide-react";
 
 export function RegisterForm() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirmPassword: "",
-  });
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    // Lógica de registro aqui
-    setTimeout(() => setLoading(false), 1000);
-  };
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      {/* Name Input */}
-      <div>
-        <label className="block text-white font-black uppercase text-sm mb-2 tracking-wider">Nome Completo</label>
-        <div className="relative">
-          <User className="absolute left-4 top-3.5 text-primary w-5 h-5" />
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="Seu nome"
-            className="w-full bg-slate-800 border-2 border-slate-700 pl-12 pr-4 py-2.5 text-white placeholder-slate-500 rounded-lg focus:outline-none focus:border-primary transition-colors text-sm"
-            required
+    <form className="space-y-6">
+      {/* NOME E TELEMÓVEL COM BORDAS DE METAL */}
+      <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex-1 group">
+          <p className="text-[10px] font-black uppercase text-blue-600 mb-1 tracking-widest">Proprietário</p>
+          <input 
+            type="text" 
+            placeholder="NOME COMPLETO"
+            className="w-full bg-transparent border-b-4 border-slate-800 focus:border-blue-600 p-3 outline-none text-white font-black italic uppercase transition-all"
+          />
+        </div>
+        <div className="flex-1">
+          <p className="text-[10px] font-black uppercase text-blue-600 mb-1 tracking-widest">Contacto</p>
+          <input 
+            type="tel" 
+            placeholder="9XX XXX XXX"
+            className="w-full bg-transparent border-b-4 border-slate-800 focus:border-blue-600 p-3 outline-none text-white font-black italic transition-all"
           />
         </div>
       </div>
 
-      {/* Email Input */}
-      <div>
-        <label className="block text-white font-black uppercase text-sm mb-2 tracking-wider">Email</label>
-        <div className="relative">
-          <Mail className="absolute left-4 top-3.5 text-primary w-5 h-5" />
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="seu@email.com"
-            className="w-full bg-slate-800 border-2 border-slate-700 pl-12 pr-4 py-2.5 text-white placeholder-slate-500 rounded-lg focus:outline-none focus:border-primary transition-colors text-sm"
-            required
-          />
-        </div>
+      {/* EMAIL */}
+      <div className="group">
+        <p className="text-[10px] font-black uppercase text-blue-600 mb-1 tracking-widest">Acesso Digital (Email)</p>
+        <input 
+          type="email" 
+          placeholder="exemplo@tspneus.pt"
+          className="w-full bg-slate-900/50 border-l-4 border-slate-800 focus:border-blue-600 p-4 outline-none text-white font-bold transition-all"
+        />
       </div>
 
-      {/* Phone Input */}
-      <div>
-        <label className="block text-white font-black uppercase text-sm mb-2 tracking-wider">Telemóvel</label>
-        <div className="relative">
-          <Phone className="absolute left-4 top-3.5 text-primary w-5 h-5" />
-          <input
-            type="tel"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            placeholder="+351 9XX XXX XXX"
-            className="w-full bg-slate-800 border-2 border-slate-700 pl-12 pr-4 py-2.5 text-white placeholder-slate-500 rounded-lg focus:outline-none focus:border-primary transition-colors text-sm"
-          />
+      {/* O CAMPO DA MATRÍCULA - O CORAÇÃO DO SITE */}
+      <div className="relative pt-4">
+        <div className="bg-yellow-400 p-1 rotate-1 shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]">
+          <div className="bg-white border-2 border-black p-4 flex flex-col items-center">
+            <span className="text-[10px] font-black text-black/40 uppercase mb-1">Chapa de Matrícula</span>
+            <input 
+              type="text" 
+              placeholder="00-AA-00"
+              className="w-full text-center bg-transparent text-3xl font-mono font-black text-black outline-none uppercase tracking-tighter"
+            />
+          </div>
         </div>
+        <p className="text-[9px] font-bold text-slate-500 mt-4 text-center uppercase tracking-widest italic">
+          * A matrícula será o seu ID único para rastrear reparações
+        </p>
       </div>
 
-      {/* Password Input */}
-      <div>
-        <label className="block text-white font-black uppercase text-sm mb-2 tracking-wider">Palavra-passe</label>
-        <div className="relative">
-          <Lock className="absolute left-4 top-3.5 text-primary w-5 h-5" />
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="••••••••"
-            className="w-full bg-slate-800 border-2 border-slate-700 pl-12 pr-4 py-2.5 text-white placeholder-slate-500 rounded-lg focus:outline-none focus:border-primary transition-colors text-sm"
-            required
-          />
-        </div>
-      </div>
-
-      {/* Confirm Password */}
-      <div>
-        <label className="block text-white font-black uppercase text-sm mb-2 tracking-wider">Confirmar Palavra-passe</label>
-        <div className="relative">
-          <Lock className="absolute left-4 top-3.5 text-primary w-5 h-5" />
-          <input
-            type="password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            placeholder="••••••••"
-            className="w-full bg-slate-800 border-2 border-slate-700 pl-12 pr-4 py-2.5 text-white placeholder-slate-500 rounded-lg focus:outline-none focus:border-primary transition-colors text-sm"
-            required
-          />
-        </div>
-      </div>
-
-      {/* Terms */}
-      <label className="flex items-center gap-2 cursor-pointer">
-        <input type="checkbox" className="w-4 h-4 rounded bg-slate-800 border-slate-700 accent-primary" required />
-        <span className="text-slate-400 text-sm font-medium">Concordo com os <span className="text-primary font-black">Termos de Serviço</span></span>
-      </label>
-
-      {/* Submit Button */}
-      <Button 
-        type="submit"
+      {/* BOTÃO BRUTALISTA */}
+      <button 
+        className="w-full group relative bg-blue-600 p-6 overflow-hidden transition-all hover:bg-black"
         disabled={loading}
-        className="w-full h-12 bg-primary text-black font-black uppercase italic text-base rounded-lg hover:bg-yellow-400 transition-colors flex items-center justify-center gap-3 mt-6"
       >
-        {loading ? "Criando conta..." : (
-          <>
-            <span>Registrar-se</span>
-            <ArrowRight className="w-5 h-5" />
-          </>
-        )}
-      </Button>
+        <div className="relative z-10 flex items-center justify-center gap-4">
+          <span className="text-2xl font-black italic uppercase text-white tracking-tighter">
+            ATIVAR ACESSO À OFICINA
+          </span>
+          <ArrowRight className="text-white group-hover:translate-x-2 transition-transform" />
+        </div>
+        {/* Efeito de brilho de metal que passa no botão */}
+        <div className="absolute top-0 -left-[100%] w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:left-[100%] transition-all duration-1000" />
+      </button>
     </form>
   );
 }
