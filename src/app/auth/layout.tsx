@@ -1,20 +1,24 @@
-import { AuthSlider } from "../components/auth/auth-transition";
+"use client";
 
-export default function AuthLayout({ children }: { children: React.ReactNode }) {
+import React from "react";
+
+export default function AuthLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-12 bg-[#05070a] overflow-hidden">
-      {/* LADO ESQUERDO (Logo e Texto) - Fica Estático */}
-      <div className="hidden lg:flex lg:col-span-4 p-12 flex-col justify-between border-r-2 border-blue-600/20 bg-garage-texture">
-         {/* ... o conteúdo da logo que fizemos antes ... */}
-      </div>
+    <div className="min-h-screen bg-[#05070a] relative overflow-hidden bg-carbon-fiber flex items-center justify-center selection:bg-blue-600/30">
+      {/* Camada de Scanline - Fica aqui para não resetar na animação */}
+      <div className="auth-scanline pointer-events-none" />
+      
+      {/* Luz Neon de fundo (Brilho azul subtil no canto) */}
+      <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-blue-900/5 rounded-full blur-[120px] pointer-events-none" />
 
-      {/* LADO DIREITO (Formulários) - Tem a Transição */}
-      <div className="lg:col-span-8 flex items-center justify-center p-8 relative">
-        <div className="w-full max-w-xl z-10">
-          <AuthSlider isLogin={true}>
-            {children}
-          </AuthSlider>
-        </div>
+      {/* Aqui é onde entra o conteúdo da page.tsx (o teu card com o slider) */}
+      <div className="w-full h-full flex items-center justify-center p-4 relative z-10">
+        {children}
       </div>
     </div>
   );

@@ -69,7 +69,7 @@ export default function Home() {
       </section>
 
       {/* INFO RÁPIDA - COMO NO GOOGLE MAPS */}
-      <section className="bg-white text-black py-16">
+      <section className="w-full h-64 bg-slate-900 text-white py-16">
         <div className="container mx-auto px-6 flex flex-wrap justify-between items-center gap-12">
           <div>
             <h2 className="text-4xl font-black uppercase italic leading-none mb-2">Visite a nossa oficina</h2>

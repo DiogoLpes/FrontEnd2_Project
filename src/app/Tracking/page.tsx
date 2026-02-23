@@ -1,5 +1,5 @@
 import { Car, Wrench } from "lucide-react";
-import { Button } from "../../components/ui/button";
+import { Button } from "../components/ui/button";
 
 export default function RastreioPage() {
   return (
@@ -20,17 +20,10 @@ export default function RastreioPage() {
             </div>
             <div>
               <h2 className="text-2xl font-black text-white italic uppercase tracking-tighter">Volkswagen Golf GTI</h2>
-              <span className="bg-slate-800 text-blue-400 font-mono px-3 py-1 text-sm border border-blue-600/30">MATRÍCULA: 44-GTI-99</span>
+              <span className="bg-slate-800 text-blue-400 font-mono px-3 py-1 text-sm border border-blue-600/30">MATRÍCULA: XX-XX-XX</span>
             </div>
           </div>
           
-          {/* Timeline de progresso bruta */}
-          <div className="relative h-2 bg-slate-800 mb-12">
-             <div className="absolute top-0 left-0 h-full bg-blue-600 w-[70%]" />
-             <div className="absolute top-[-10px] left-[70%] w-6 h-6 bg-blue-600 rotate-45 border-2 border-white flex items-center justify-center">
-                <Wrench size={12} className="text-white -rotate-45" />
-             </div>
-          </div>
           
           <div className="grid grid-cols-2 gap-4">
              <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">Última Atualização</p>
