@@ -39,19 +39,19 @@ export default function AgendarPage() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {[
-                { id: 'pneus', label: 'Pneus', img: 'https://images.unsplash.com/photo-1543674892-7d64d45df18b?q=80&w=300' },
-                { id: 'revisao', label: 'Revisão / Óleo', img: 'https://images.unsplash.com/photo-1487754180451-c456f7196144?q=80&w=300' },
-                { id: 'travoes', label: 'Travões', img: 'https://images.unsplash.com/photo-1486006391864-1b2df335d2b4?q=80&w=300' },
-                { id: 'mecanica', label: 'Mecânica Geral', img: 'https://images.unsplash.com/photo-1507702553912-a15641ec5f22?q=80&w=300' },
-                { id: 'luzes', label: 'Eletrónica', img: 'https://images.unsplash.com/photo-1551522435-a13afa10f103?q=80&w=300' },
-                { id: 'outro', label: 'Outro Problema', img: 'https://images.unsplash.com/photo-1517524008436-bb401ac293de?q=80&w=300' },
+                { id: 'pneus', label: 'Pneus', img: '/assets/pneus.jpg' },
+                { id: 'revisao', label: 'Revisão / Óleo', img: '/assets/oleo.png' },
+                { id: 'travoes', label: 'Travões', img: '/assets/travoes.jpg' },
+                { id: 'mecanica', label: 'Mecânica Geral', img: '/assets/mecanica.jpeg' },
+                { id: 'luzes', label: 'Eletrónica', img: '/assets/luzes.jpg' },
+                { id: 'outro', label: 'Outro Problema', img: '/assets/outro.jpg' },
               ].map((item) => (
                 <button
                   key={item.id}
                   onClick={() => setServico(item.id)}
                   type="button"
-                  className={`relative h-24 rounded-xl overflow-hidden group transition-all border-2 ${
-                    servico === item.id ? 'border-blue-600 scale-[1.02]' : 'border-transparent'
+                  className={`relative h-26 rounded-xl overflow-hidden group transition-all border-2 ${
+                    servico === item.id ? 'border-blue-600 scale-[1.05]' : 'border-transparent'
                   }`}
                 >
                   <img src={item.img} className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity" />
@@ -81,12 +81,12 @@ export default function AgendarPage() {
             </label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex items-center gap-4 bg-[#14171c] p-4 rounded-xl border border-white/5">
-                <Calendar className="text-blue-600" />
-                <input type="date" className="bg-transparent text-white font-bold outline-none w-full invert brightness-200" />
+                <Calendar className="text-white" />
+                <input type="date" className="bg-transparent text-white font-bold outline-none w-full brightness-50" />
               </div>
               <div className="flex items-center gap-4 bg-[#14171c] p-4 rounded-xl border border-white/5">
-                <Clock className="text-blue-600" />
-                <input type="time" className="bg-transparent text-white font-bold outline-none w-full invert brightness-200" />
+                <Clock className="text-white" />
+                <input type="time" className="bg-transparent text-white font-bold outline-none w-full brightness-50" />
               </div>
             </div>
           </div>
