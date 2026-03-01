@@ -71,9 +71,9 @@ export default function Navbar() {
                 href="/auth?mode=login" 
                 className="text-xs font-black uppercase italic text-white hover:text-blue-600 px-4 transition-colors"
               >
-                Entrar
+              Entrar
               </Link>
-              
+  
               <Link href="/auth?mode=register">
                 <Button className="bg-white hover:bg-blue-600 hover:text-white text-black font-black uppercase italic px-6 rounded-none skew-x-[-12deg] transition-all border-none">
                   <span className="skew-x-[12deg]">Criar Conta</span>

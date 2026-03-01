@@ -5,6 +5,8 @@ CREATE TABLE "User" (
     "name" TEXT,
     "password" TEXT NOT NULL,
     "role" TEXT NOT NULL DEFAULT 'USER',
+    "phone" TEXT,
+    "plate" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")

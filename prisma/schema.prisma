@@ -12,6 +12,8 @@ model User {
   name      String?
   password  String   // Importante para o Login
   role      String   @default("USER") // Para depois separares o Admin
+  phone     String?
+  plate     String?
   vehicles  Vehicle[]
   createdAt DateTime @default(now())
 }

@@ -1,16 +1,44 @@
-"use server"
+"use server";
 
-import { saveUserAfterLogin } from "../../../hello-prisma/src/services/user-service";
-import { redirect } from "next/navigation";
+import prisma from "../lib/prisma"; 
+import bcrypt from "bcryptjs";
 
-export async function handleLoginAction(formData: FormData) {
-  const email = formData.get("email") as string;
-  const name = formData.get("name") as string;
+export async function registerUser(data: any) {
+  try {
+    const { name, email, password, plate, phone } = data;
 
-  // Guarda na base de dados (Docker)
-  const user = await saveUserAfterLogin({ email, name });
+    // 1. Verificar se o utilizador já existe
+    const userExists = await prisma.user.findUnique({
+      where: { email }
+    });
 
-  if (user) {
-    redirect("/dashboard"); // Leva o cliente para a oficina
+    if (userExists) throw new Error("Utilizador já existe");
+
+    // 2. Encriptar a password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // 3. Criar no Banco de Dados (User + Vehicle)
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        phone, 
+        plate,
+
+        vehicles: {
+          create: {
+            plate: plate,
+            brand: "Padrão", 
+            model: "Padrão",
+          }
+        }
+      },
+    });
+
+    return user;
+  } catch (error: any) {
+    console.error("Erro no registo:", error);
+    throw new Error(error.message || "Erro ao criar conta");
   }
 }
