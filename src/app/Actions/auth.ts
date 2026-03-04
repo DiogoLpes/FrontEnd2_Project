@@ -13,11 +13,9 @@ export async function registerUser(data: any) {
     });
 
     if (userExists) throw new Error("Utilizador já existe");
-
-    // 2. Encriptar a password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 3. Criar no Banco de Dados (User + Vehicle)
+
     const user = await prisma.user.create({
       data: {
         name,
