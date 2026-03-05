@@ -26,7 +26,6 @@ function AuthContent() {
     else if (mode === "login") setIsLogin(true);
   }, [searchParams]);
 
-  // LÓGICA DE MÁSCARA SEM ALTERAR O VISUAL
   const handlePlateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
     if (value.length > 6) value = value.slice(0, 6);
@@ -39,7 +38,6 @@ function AuthContent() {
     if (value.length <= 9) setPhone(value);
   };
 
-  // SWEET ALERT QUE SE ENCAIXA NO TEU DESIGN
   const toast = (title: string, text: string, icon: 'success' | 'error' | 'warning') => {
     Swal.fire({
       title, text, icon,
@@ -52,9 +50,11 @@ function AuthContent() {
     });
   };
 
+  // --- LOGIN TRADICIONAL ---
   const handleLogin = async () => {
     setLoading(true);
     const res = await signIn("credentials", { email, password, redirect: false });
+    
     if (res?.error) {
       toast("ERRO", "Credenciais inválidas.", "error");
     } else {
@@ -67,11 +67,13 @@ function AuthContent() {
         background: "#0d0f14",
         color: "#fff"
       });
-      router.push("/"); 
+      router.push("/"); // Manda para a garagem
+      router.refresh();
     }
     setLoading(false);
   };
 
+  // --- REGISTO COM AUTO-LOGIN ---
   const handleRegister = async () => {
     if (!name || !email || !password || !plate) {
       toast("AVISO", "Preencha todos os campos.", "warning");
@@ -79,17 +81,33 @@ function AuthContent() {
     }
     setLoading(true);
     try {
+      // 1. Cria o utilizador
       const res = await registerUser({ name, email, password, plate, phone });
+      
       if (res && res.id) {
-        await Swal.fire({
-          title: "CONTA CRIADA!",
-          text: "A entrar no sistema...",
-          icon: "success",
-          background: "#0d0f14",
-          color: "#fff",
-          confirmButtonColor: "#2563eb"
+        // 2. Tenta Logar automaticamente
+        const loginRes = await signIn("credentials", { 
+          email, 
+          password, 
+          redirect: false 
         });
-        router.push("/"); 
+
+        if (loginRes?.ok) {
+          await Swal.fire({
+            title: "CONTA CRIADA!",
+            text: "Terminal configurado. A entrar no sistema...",
+            icon: "success",
+            background: "#0d0f14",
+            color: "#fff",
+            confirmButtonColor: "#2563eb"
+          });
+          router.push("/login"); 
+          router.refresh();
+        } else {
+          // Fallback caso o auto-login falhe: manda para o login manual
+          setIsLogin(true);
+          toast("CONTA CRIADA", "Por favor, faça login manualmente.", "success");
+        }
       }
     } catch (err: any) {
       toast("ERRO", err.message, "error");
@@ -101,6 +119,7 @@ function AuthContent() {
   return (
     <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 bg-[#0d0f14] border border-white/5 shadow-2xl relative z-10 overflow-hidden">
       
+      {/* Lado Esquerdo - Branding (MANTIDO) */}
       <div className="hidden lg:flex lg:col-span-5 flex-col justify-between p-12 bg-[#080a0f] border-r border-white/5 relative">
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-12">
@@ -125,6 +144,7 @@ function AuthContent() {
         </div>
       </div>
 
+      {/* Lado Direito - Form (MANTIDO) */}
       <div className="lg:col-span-7 p-8 lg:p-12 flex flex-col justify-center min-h-[850px] bg-[#0d0f14]">
         <AuthSlider isLogin={isLogin}>
           {isLogin ? (
@@ -217,8 +237,10 @@ function AuthContent() {
 
 export default function AuthPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#05070a]" />}>
-      <AuthContent />
-    </Suspense>
+    <div className="min-h-screen flex items-center justify-center bg-[#05070a] p-4">
+      <Suspense fallback={<div className="text-white">A carregar terminal...</div>}>
+        <AuthContent />
+      </Suspense>
+    </div>
   );
 }
