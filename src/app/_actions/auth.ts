@@ -1,36 +1,49 @@
 "use server";
 
-import prisma from "../lib/prisma"; 
+import prisma from "../lib/prisma";
 import bcrypt from "bcryptjs";
 
 export async function registerUser(data: any) {
   try {
     const { name, email, password, plate, phone } = data;
 
-    // 1. Verificar se o utilizador já existe
+    // verificar se já existe utilizador
     const userExists = await prisma.user.findUnique({
-      where: { email }
+      where: { email },
     });
 
-    if (userExists) throw new Error("Utilizador já existe");
-    const hashedPassword = await bcrypt.hash(password, 10);
+    if (userExists) {
+      throw new Error("Utilizador já existe");
+    }
 
+    // verificar se a matrícula já existe
+    const vehicleExists = await prisma.vehicle.findUnique({
+      where: { plate },
+    });
+
+    if (vehicleExists) {
+      throw new Error("Esta matrícula já está registada");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
-        phone, 
-        plate,
+        phone,
 
         vehicles: {
           create: {
             plate: plate,
-            brand: "Padrão", 
+            brand: "Padrão",
             model: "Padrão",
-          }
-        }
+          },
+        },
+      },
+      include: {
+        vehicles: true,
       },
     });
 

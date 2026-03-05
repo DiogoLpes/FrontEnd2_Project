@@ -1,12 +1,23 @@
+-- CreateEnum
+CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN');
+
+-- CreateEnum
+CREATE TYPE "FuelType" AS ENUM ('GASOLINA', 'DIESEL', 'HIBRIDO', 'ELETRICO');
+
+-- CreateEnum
+CREATE TYPE "ServiceType" AS ENUM ('REVISAO', 'PNEUS', 'OLEO', 'TRAVOES', 'DIAGNOSTICO', 'OUTRO');
+
+-- CreateEnum
+CREATE TYPE "ServiceStatus" AS ENUM ('PENDENTE', 'EM_REPARACAO', 'CONCLUIDO');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
     "email" TEXT NOT NULL,
     "name" TEXT,
     "password" TEXT NOT NULL,
-    "role" TEXT NOT NULL DEFAULT 'USER',
+    "role" "Role" NOT NULL DEFAULT 'USER',
     "phone" TEXT,
-    "plate" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
@@ -15,10 +26,14 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Vehicle" (
     "id" SERIAL NOT NULL,
-    "brand" TEXT NOT NULL,
-    "model" TEXT NOT NULL,
     "plate" TEXT NOT NULL,
+    "brand" TEXT,
+    "model" TEXT,
+    "year" INTEGER,
+    "fuel" "FuelType",
+    "mileage" INTEGER,
     "ownerId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Vehicle_pkey" PRIMARY KEY ("id")
 );
@@ -26,11 +41,14 @@ CREATE TABLE "Vehicle" (
 -- CreateTable
 CREATE TABLE "Service" (
     "id" SERIAL NOT NULL,
-    "type" TEXT NOT NULL,
+    "type" "ServiceType" NOT NULL,
     "description" TEXT,
     "date" TIMESTAMP(3) NOT NULL,
-    "status" TEXT NOT NULL DEFAULT 'PENDENTE',
+    "mileage" INTEGER,
+    "price" DOUBLE PRECISION,
+    "status" "ServiceStatus" NOT NULL DEFAULT 'PENDENTE',
     "vehicleId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Service_pkey" PRIMARY KEY ("id")
 );

@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Lock, Mail, Car, ArrowRight, ShieldCheck, User, Phone, CheckCircle2 } from "lucide-react";
 import { AuthSlider } from "./auth-slider";
-import { registerUser } from "../Actions/auth"; 
+import { registerUser } from "../_actions/auth"; 
 import { signIn } from "next-auth/react";
 import Swal from "sweetalert2";
 

@@ -47,6 +47,7 @@ export default function Home() {
       </section>
 
       {/* SECÇÃO DE SERVIÇOS - CARDS RUGOSOS */}
+      
       <section className="py-24 container mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
           {[
@@ -67,6 +68,7 @@ export default function Home() {
           ))}
         </div>
       </section>
+      
 
       {/* INFO RÁPIDA - COMO NO GOOGLE MAPS */}
       <section className="w-full h-64 bg-slate-900 text-white py-16">

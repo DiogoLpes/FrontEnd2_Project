@@ -6,10 +6,7 @@ export default function RastreioPage() {
     <div className="min-h-screen pt-32 bg-slate-950 flex flex-col items-center">
       <div className="w-full max-w-4xl px-6">
         <div className="bg-blue-600 p-8 flex justify-between items-center mb-1">
-          <h1 className="text-3xl font-black italic uppercase text-white">Minha Garagem</h1>
-          <Button className="bg-black text-white rounded-none uppercase font-black italic px-6 hover:bg-white hover:text-black transition-all">
-            + Adicionar Veículo
-          </Button>
+          <h1 className="text-3xl font-black italic uppercase text-white">Status</h1>
         </div>
         
         {/* Card do Carro que está na oficina agora */}
