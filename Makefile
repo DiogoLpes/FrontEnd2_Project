@@ -12,7 +12,7 @@ setup:
 	@echo "A dar tempo ao Postgres para tomar café (10s)..."
 	@sleep 10
 	DATABASE_URL="postgresql://admin:password123@127.0.0.1:5432/tspneus?schema=public" bunx prisma migrate dev --name inicializacao
-	DATABASE_URL="postgresql://admin:password123@127.0.0.1:5432/tspneus?schema=public" bunx prisma studio
+	DATABASE_URL="postgresql://admin:password123@127.0.0.1:5432/tspneus?schema=public" bunx prisma studio --port 5555 --browser none
 
 # Gera o Prisma Client
 gen:

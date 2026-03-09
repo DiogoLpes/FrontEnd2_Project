@@ -102,8 +102,8 @@ function AuthContent() {
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value.replace(/\D/g, ""); // Remove tudo o que não é número
-    if (val.length <= 9) updateField("phone", val); // Limite de 9 dígitos (Portugal)
+    const val = e.target.value.replace(/\D/g, ""); 
+    if (val.length <= 9) updateField("phone", val); 
   };
 
   const toast = (title: string, text: string, icon: any) => {
@@ -128,7 +128,6 @@ function AuthContent() {
     const res = await signIn("credentials", { email: formData.email, password: formData.password, redirect: false });
     if (res?.error) toast("ERRO", "Acesso Negado. Verifique email e password.", "error");
     else {
-        toast("SUCESSO", "Terminal desbloqueado.", "success");
         router.push("/");
     }
     setLoading(false);
@@ -171,7 +170,7 @@ function AuthContent() {
         <AuthSlider isLogin={isLogin}>
           <div className="space-y-6">
             <div className="space-y-1">
-              <h2 className="text-3xl font-black italic text-white uppercase tracking-tighter">{isLogin ? "Acesso Terminal" : "Registo de Operador"}</h2>
+              <h2 className="text-3xl font-black italic text-white uppercase tracking-tighter">{isLogin ? "Login" : "Registo"}</h2>
               <div className="h-0.5 w-12 bg-blue-600"></div>
             </div>
             
@@ -183,7 +182,7 @@ function AuthContent() {
                 </div>
               )}
 
-              <TerminalInput label="Endereço Email" icon={Mail} placeholder="ADMIN@TS-PNEUS.PT" value={formData.email} onChange={(e:any) => updateField("email", e.target.value)} error={errors.email} />
+              <TerminalInput label="Endereço Email" icon={Mail} placeholder="user@dominio.com" value={formData.email} onChange={(e:any) => updateField("email", e.target.value)} error={errors.email} />
 
               <div className="relative">
                 <TerminalInput label="Chave de Acesso" icon={Lock} type={showPassword ? "text" : "password"} placeholder="••••••••" value={formData.password} onChange={(e:any) => updateField("password", e.target.value)} />
@@ -205,7 +204,7 @@ function AuthContent() {
             </button>
 
             <p className="text-center text-slate-500 font-bold uppercase text-[10px] tracking-widest cursor-pointer hover:text-blue-600 transition-colors" onClick={() => { setIsLogin(!isLogin); setErrors({}); }}>
-              {isLogin ? "Não tem conta? Criar acesso aqui" : "Já possui conta? Entrar no sistema"}
+              {isLogin ? "Não tem conta? Criar acesso aqui" : "Já possui conta? Entrar em TS Pneus"}
             </p>
           </div>
         </AuthSlider>

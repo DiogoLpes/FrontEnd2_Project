@@ -58,7 +58,6 @@ export const authOptions: NextAuthOptions = {
   },
 };
 
-// 2. O HANDLER USA AS OPÇÕES DEFINIDAS ACIMA
 const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

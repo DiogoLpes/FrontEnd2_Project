@@ -32,7 +32,7 @@ CREATE TABLE "Vehicle" (
     "color" TEXT,
     "year" INTEGER,
     "fuel" "FuelType",
-    "mileage" INTEGER,
+    "imageUrl" TEXT,
     "ownerId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
