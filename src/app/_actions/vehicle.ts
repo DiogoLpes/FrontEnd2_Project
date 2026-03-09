@@ -5,10 +5,11 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../lib/auth";
 import { revalidatePath } from "next/cache";
 
-export async function addVehicleAction(plate: string, brand?: string, model?: string) {
+// Alteramos para receber um objeto 'data' (que contém plate, brand, model, color)
+export async function addVehicleAction(data: any) {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user?.email) throw new Error("Sessão expirada.");
+  if (!session?.user?.email) throw new Error("Sessão expirada. Faça login novamente.");
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
@@ -16,15 +17,23 @@ export async function addVehicleAction(plate: string, brand?: string, model?: st
 
   if (!user) throw new Error("Utilizador inválido.");
 
-  const newVehicle = await prisma.vehicle.create({
+  // Extraímos os dados do objeto enviado pelo Modal
+  const { plate, brand, model, color } = data;
+
+  // Validação extra para não deixar passar matrículas vazias
+  if (!plate) throw new Error("A matrícula é obrigatória.");
+
+  const newVehicle = await (prisma.vehicle as any).create({
     data: {
-      plate: plate,
+      plate: plate.toUpperCase(), // Gravamos sempre em Maiúsculas
       brand: brand || "Desconhecido",
       model: model || "Desconhecido", 
+      color: color || "white", 
       ownerId: user.id,
     },
   });
 
-  revalidatePath("/dashboard");
+  // Revalidamos a página da garagem para o carro aparecer logo
+  revalidatePath("/garagem"); 
   return newVehicle;
 }

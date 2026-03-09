@@ -22,6 +22,7 @@ model Vehicle {
   plate     String   @unique
   brand     String?
   model     String?
+  color     String?
   year      Int?
   fuel      FuelType?
   mileage   Int?

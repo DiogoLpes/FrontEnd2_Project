@@ -29,6 +29,7 @@ CREATE TABLE "Vehicle" (
     "plate" TEXT NOT NULL,
     "brand" TEXT,
     "model" TEXT,
+    "color" TEXT,
     "year" INTEGER,
     "fuel" "FuelType",
     "mileage" INTEGER,
