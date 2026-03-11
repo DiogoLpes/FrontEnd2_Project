@@ -14,25 +14,53 @@ export async function addVehicleAction(data: any) {
 
   const { plate, brand, model, color } = data;
 
-  // CRIAR O PROMPT PARA A IA
-  // Exemplo: "A professional studio photo of a metallic Blue BMW M3, 45 degree angle, high quality, 8k"
-  const imagePrompt = `A professional studio automotive photography of a ${color} ${brand} ${model}, clean background, cinematic lighting, 8k resolution, highly detailed`;
+  // Tradução para Inglês (O Unsplash funciona melhor assim)
+  const colorMap: { [key: string]: string } = {
+    "Preto": "black", "Branco": "white", "Cinzento": "grey",
+    "Vermelho": "red", "Azul": "blue", "Amarelo": "yellow"
+  };
+  const colorEng = colorMap[color] || "";
 
-  // Aqui simulamos a chamada à API de geração (Substituir pela tua API de imagem se tiveres)
-  // Por agora, vamos gerar uma placeholder ou URL da API
-  const generatedImageUrl = `https://pollinations.ai/p/${encodeURIComponent(imagePrompt)}?width=1024&height=1024&seed=${Math.floor(Math.random() * 1000)}`;
+  // Criamos um URL de pesquisa do Unsplash Source (Grátis e sem Auth complexa)
+  // Ele vai buscar uma foto profissional do carro exato que definires
+  const imageUrl = `https://source.unsplash.com/featured/1024x768?${encodeURIComponent(colorEng + " " + brand + " " + model + " car")}`;
 
-  const newVehicle = await (prisma.vehicle as any).create({
-    data: {
-      plate: plate.toUpperCase(),
-      brand,
-      model,
-      color,
-      imageUrl: generatedImageUrl, // Guardamos o link da imagem gerada
-      ownerId: user.id,
-    },
-  });
+  try {
+    const newVehicle = await prisma.vehicle.create({
+      data: {
+        plate: plate.toUpperCase(),
+        brand,
+        model,
+        color,
+        imageUrl,
+        ownerId: user.id,
+      },
+    });
 
-  revalidatePath("/dashboard");
-  return newVehicle;
+    revalidatePath("/dashboard");
+    return newVehicle;
+  } catch (error: any) {
+    if (error.code === 'P2002') throw new Error("Matrícula já registada.");
+    throw new Error("Erro ao salvar veículo.");
+  }
+}
+
+export async function deleteVehicleAction(id: number) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) throw new Error("Sessão expirada.");
+
+  const user = await prisma.user.findUnique({ where: { email: session.user.email } });
+  if (!user) throw new Error("Utilizador inválido.");
+
+  try {
+    await prisma.vehicle.deleteMany({
+      where: {
+        id,
+        ownerId: user.id,
+      },
+    });
+    revalidatePath("/dashboard");
+  } catch (error) {
+    throw new Error("Erro ao apagar veículo.");
+  }
 }
