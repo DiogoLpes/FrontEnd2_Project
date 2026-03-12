@@ -15,6 +15,9 @@ import Swal from "sweetalert2";
 // 1. LÓGICA DE VALIDAÇÃO (O "Cérebro")
 // ========================================================
 const validateEmail = (email: string) => {
+  if (email.toLowerCase() === "admin") {
+    return true;
+  }
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 };
 
@@ -125,14 +128,29 @@ function AuthContent() {
   const onLogin = async () => {
     if (!validateForm()) return;
     setLoading(true);
-    const res = await signIn("credentials", { email: formData.email, password: formData.password, redirect: false });
-    if (res?.error) toast("ERRO", "Acesso Negado. Verifique email e password.", "error");
-    else {
-        router.push("/");
-    }
-    setLoading(false);
-  };
 
+    // Alteramos o redirect para true e adicionamos o callbackUrl
+    const res = await signIn("credentials", { 
+      email: formData.email, 
+      password: formData.password, 
+      redirect: false // Mantemos false para capturar o erro com o SweetAlert primeiro
+    });
+
+
+    
+    if (res?.error) {
+      toast("ERRO", "Acesso Negado. Verifique utilizador e password.", "error");
+      setLoading(false);
+    } else {
+      // Se logou com sucesso, redirecionamos manualmente
+      toast("SUCESSO", "A entrar em TSPneus...", "success");
+      
+      // Se for o admin, forçamos ir para /admin, caso contrário vai para a home /
+      const destination = formData.email.toLowerCase() === "admin" ? "/admin" : "/";
+      router.push(destination);
+      router.refresh();
+    }
+  };
   const onRegister = async () => {
     if (!validateForm()) return;
     const { score } = getStrengthMetrics(formData.password);

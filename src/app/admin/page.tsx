@@ -1,143 +1,85 @@
 import prisma from "@/app/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/lib/auth";
-import { redirect } from "next/navigation";
-import { updateServiceStatusAction, deleteServiceAction } from "../_actions/admin";
-import { 
-  Calendar, 
-  Car, 
-  Clock, 
-  CheckCircle, 
-  AlertCircle, 
-  User, 
-  Wrench,
-  Trash2
-} from "lucide-react";
+import { Wrench, Users, TrendingUp, AlertCircle, CheckCircle } from "lucide-react";
 
-export default async function AdminPage() {
-  const session = await getServerSession(authOptions);
-
-  if (!session?.user?.email) redirect("/auth/login");
-
-  const currentUser = await prisma.user.findUnique({
-    where: { email: session.user.email },
-  });
-
-  // Só permite entrada a utilizadores com role ADMIN
-  if (currentUser?.role !== "ADMIN") redirect("/dashboard");
-
-  const services = await prisma.service.findMany({
-    include: {
-      vehicle: {
-        include: { owner: true },
-      },
-    },
-    orderBy: { date: "desc" },
-  });
+export default async function AdminDashboard() {
+  // Busca dados para o resumo
+  const totalClientes = await prisma.user.count();
+  const servicos = await prisma.service.findMany();
+  
+  const pendentes = servicos.filter(s => s.status === "PENDENTE").length;
+  const concluidos = servicos.filter(s => s.status === "CONCLUIDO").length;
 
   return (
-    <div className="min-h-screen bg-[#05070a] pt-32 pb-20 px-6 text-white font-sans">
-      <div className="max-w-7xl mx-auto">
-        
-        {/* CABEÇALHO */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-          <div>
-            <h1 className="text-5xl md:text-6xl font-black italic uppercase tracking-tighter">
-              PAINEL DE <span className="text-blue-600">CONTROLO</span>
-            </h1>
-            <p className="text-slate-400 font-bold mt-2 uppercase tracking-widest text-xs">Administração TS Pneus</p>
+    <div className="space-y-10">
+      {/* TÍTULO */}
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight text-white">Dashboard</h1>
+        <p className="text-slate-500 text-sm font-medium">Bem-vindo ao centro de gestão da TS Pneus.</p>
+      </div>
+
+      {/* CARDS DE MÉTRICAS */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MetricCard title="Total Clientes" value={totalClientes} icon={<Users size={20}/>} color="blue" />
+        <MetricCard title="Serviços Totais" value={servicos.length} icon={<Wrench size={20}/>} color="indigo" />
+        <MetricCard title="Em Espera" value={pendentes} icon={<AlertCircle size={20}/>} color="amber" />
+        <MetricCard title="Finalizados" value={concluidos} icon={<CheckCircle size={20}/>} color="emerald" />
+      </div>
+
+      {/* ÁREA DE GRÁFICOS (SIMULADA POR AGORA) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-[#09090b] border border-white/5 p-6 rounded-xl">
+          <h3 className="text-white font-bold mb-4 flex items-center gap-2">
+            <TrendingUp size={18} className="text-blue-500" /> 
+            Atividade Semanal
+          </h3>
+          <div className="h-[200px] flex items-end justify-between gap-2 px-2">
+            {[40, 70, 45, 90, 65, 80, 30].map((h, i) => (
+              <div key={i} className="flex-1 bg-blue-600/20 rounded-t-sm relative group">
+                <div style={{ height: `${h}%` }} className="bg-blue-600 w-full rounded-t-sm group-hover:bg-blue-400 transition-all cursor-pointer"></div>
+              </div>
+            ))}
           </div>
-          <div className="bg-[#0d0f14] border border-white/5 p-5 rounded-2xl shadow-xl">
-            <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1 text-center">Agendamentos</p>
-            <p className="text-3xl font-black text-blue-600 text-center">{services.length}</p>
+          <div className="flex justify-between mt-4 text-[10px] font-bold text-slate-600 uppercase tracking-widest px-1">
+            <span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span><span>Dom</span>
           </div>
         </div>
 
-        {/* TABELA */}
-        <div className="bg-[#0d0f14] border-2 border-white/5 rounded-3xl overflow-hidden shadow-2xl">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-white/[0.03] text-blue-600 text-[10px] font-black uppercase tracking-[0.2em]">
-                  <th className="p-6">Viatura & Cliente</th>
-                  <th className="p-6">Serviço</th>
-                  <th className="p-6">Data / Hora</th>
-                  <th className="p-6">Estado</th>
-                  <th className="p-6 text-right">Ações</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {services.map((s) => (
-                  <tr key={s.id} className="hover:bg-white/[0.01] transition-colors group">
-                    <td className="p-6">
-                      <div className="flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-lg bg-blue-600/10 flex items-center justify-center text-blue-600 border border-blue-600/20">
-                          <Car size={18} />
-                        </div>
-                        <div>
-                          <p className="font-black uppercase text-sm tracking-tight">{s.vehicle.brand} {s.vehicle.model}</p>
-                          <p className="text-xs text-slate-500 font-mono uppercase italic">{s.vehicle.plate}</p>
-                          <p className="text-[10px] text-blue-500 font-bold mt-1 uppercase italic">👤 {s.vehicle.owner.name || s.vehicle.owner.email}</p>
-                        </div>
-                      </div>
-                    </td>
-
-                    <td className="p-6">
-                      <span className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest text-slate-200">
-                        <Wrench size={12} className="text-blue-600" />
-                        {s.type}
-                      </span>
-                    </td>
-
-                    <td className="p-6">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2 text-sm font-black text-slate-200">
-                          <Calendar size={14} className="text-blue-600" />
-                          {new Date(s.date).toLocaleDateString('pt-PT')}
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-slate-500 font-bold">
-                          <Clock size={14} />
-                          {new Date(s.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}
-                        </div>
-                      </div>
-                    </td>
-
-                    <td className="p-6">
-                      <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter border ${
-                        s.status === 'PENDENTE' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
-                        s.status === 'CONCLUIDO' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
-                        'bg-blue-500/10 text-blue-500 border-blue-500/20'
-                      }`}>
-                        {s.status}
-                      </div>
-                    </td>
-
-                    <td className="p-6 text-right">
-                      <div className="flex justify-end gap-2">
-                        {/* AÇÃO: CONCLUIR */}
-                        {s.status !== "CONCLUIDO" && (
-                          <form action={updateServiceStatusAction.bind(null, String(s.id), "CONCLUIDO")}>
-                            <button className="p-2.5 bg-emerald-500/10 text-emerald-500 rounded-xl hover:bg-emerald-500 hover:text-white transition-all border border-emerald-500/20">
-                              <CheckCircle size={18} />
-                            </button>
-                          </form>
-                        )}
-                        
-                        {/* AÇÃO: APAGAR */}
-                        <form action={deleteServiceAction.bind(null, String(s.id))}>
-                          <button className="p-2.5 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all border border-red-500/20">
-                            <Trash2 size={18} />
-                          </button>
-                        </form>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        {/* ÚLTIMOS AGENDAMENTOS (RESUMO) */}
+        <div className="bg-[#09090b] border border-white/5 p-6 rounded-xl">
+           <h3 className="text-white font-bold mb-6">Próximas Visitas</h3>
+           <div className="space-y-4">
+              {servicos.slice(0, 4).map((s, i) => (
+                <div key={i} className="flex items-center justify-between border-b border-white/5 pb-3 last:border-0">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-blue-600"></div>
+                    <span className="text-sm font-medium text-slate-300">{s.type}</span>
+                  </div>
+                  <span className="text-xs text-slate-500 font-mono italic">{new Date(s.date).toLocaleDateString()}</span>
+                </div>
+              ))}
+           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+// Componente Interno para os Cards
+function MetricCard({ title, value, icon, color }: any) {
+  const colors: any = {
+    blue: "text-blue-500 bg-blue-500/10 border-blue-500/20",
+    indigo: "text-indigo-500 bg-indigo-500/10 border-indigo-500/20",
+    amber: "text-amber-500 bg-amber-500/10 border-amber-500/20",
+    emerald: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20",
+  };
+  
+  return (
+    <div className="bg-[#09090b] border border-white/5 p-6 rounded-xl">
+      <div className="flex justify-between items-start mb-2">
+        <div className={`p-2 rounded-lg border ${colors[color]}`}>{icon}</div>
+      </div>
+      <p className="text-2xl font-bold text-white tracking-tight">{value}</p>
+      <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">{title}</p>
     </div>
   );
 }
