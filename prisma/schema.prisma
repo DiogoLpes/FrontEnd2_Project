@@ -7,43 +7,61 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
   name      String?
   password  String
-  role      Role     @default(USER)
+  role      Role      @default(USER)
   phone     String?
   vehicles  Vehicle[]
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 }
 
 model Vehicle {
-  id        Int      @id @default(autoincrement())
-  plate     String   @unique
+  id        Int       @id @default(autoincrement())
+  plate     String    @unique
   brand     String?
   model     String?
   color     String?
   year      Int?
   fuel      FuelType?
   imageUrl  String?
-  owner     User     @relation(fields: [ownerId], references: [id])
+  owner     User      @relation(fields: [ownerId], references: [id])
   ownerId   Int
   services  Service[]
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 }
 
 model Service {
-  id          Int      @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
   type        ServiceType
   description String?
   date        DateTime
   mileage     Int?
   price       Float?
   status      ServiceStatus @default(PENDENTE)
-  vehicle     Vehicle @relation(fields: [vehicleId], references: [id])
+  vehicle     Vehicle       @relation(fields: [vehicleId], references: [id])
   vehicleId   Int
-  createdAt   DateTime @default(now())
+  createdAt   DateTime      @default(now())
 }
+
+// ==========================================
+// NOVO MODELO: STOCK DE PEÇAS
+// ==========================================
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  category    String   // Ex: Pneus, Óleos, Travões
+  quantity    Int      @default(0)
+  minStock    Int      @default(5) // Para alertas de stock baixo
+  price       Float    // Preço de venda
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ==========================================
+// ENUMS
+// ==========================================
 
 enum Role {
   USER

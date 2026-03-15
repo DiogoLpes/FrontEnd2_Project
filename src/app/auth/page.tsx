@@ -12,12 +12,11 @@ import { signIn } from "next-auth/react";
 import Swal from "sweetalert2";
 
 // ========================================================
-// 1. LÓGICA DE VALIDAÇÃO (O "Cérebro")
+// 1. LÓGICA DE VALIDAÇÃO
 // ========================================================
 const validateEmail = (email: string) => {
-  if (email.toLowerCase() === "admin") {
-    return true;
-  }
+  // Permite "admin" ou o formato normal de email
+  if (email.toLowerCase() === "admin") return true;
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 };
 
@@ -100,7 +99,6 @@ function AuthContent() {
 
   const updateField = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    // Limpa o erro do campo quando o usuário começa a digitar
     if (errors[field]) setErrors((prev: any) => ({ ...prev, [field]: null }));
   };
 
@@ -115,7 +113,7 @@ function AuthContent() {
 
   const validateForm = () => {
     const newErrors: any = {};
-    if (!validateEmail(formData.email)) newErrors.email = "Email Inválido (ex: user@dominio.com)";
+    if (!validateEmail(formData.email)) newErrors.email = "Utilizador ou Email Inválido";
     if (!isLogin) {
       if (!formData.name) newErrors.name = "Nome obrigatório";
       if (formData.phone.length < 9) newErrors.phone = "Número incompleto (9 dígitos)";
@@ -129,28 +127,32 @@ function AuthContent() {
     if (!validateForm()) return;
     setLoading(true);
 
-    // Alteramos o redirect para true e adicionamos o callbackUrl
     const res = await signIn("credentials", { 
       email: formData.email, 
       password: formData.password, 
-      redirect: false // Mantemos false para capturar o erro com o SweetAlert primeiro
+      redirect: false 
     });
 
-
-    
     if (res?.error) {
       toast("ERRO", "Acesso Negado. Verifique utilizador e password.", "error");
       setLoading(false);
     } else {
-      // Se logou com sucesso, redirecionamos manualmente
       toast("SUCESSO", "A entrar em TSPneus...", "success");
       
-      // Se for o admin, forçamos ir para /admin, caso contrário vai para a home /
-      const destination = formData.email.toLowerCase() === "admin" ? "/admin" : "/";
-      router.push(destination);
+      // Forçamos o refresh para o middleware reconhecer o cookie de sessão imediatamente
       router.refresh();
+
+      // Definir destino: se for admin ou admin@local.com, vai para /admin
+      const userMail = formData.email.toLowerCase();
+      const destination = (userMail === "admin" || userMail === "admin@local.com") ? "/admin" : "/";
+
+      // Delay de 500ms para garantir que o refresh e o cookie estão prontos antes da navegação
+      setTimeout(() => {
+        router.push(destination);
+      }, 500);
     }
   };
+
   const onRegister = async () => {
     if (!validateForm()) return;
     const { score } = getStrengthMetrics(formData.password);
@@ -163,8 +165,11 @@ function AuthContent() {
           toast("CONTA CRIADA", "Bem-vindo ao TS Pneus.", "success");
           await signIn("credentials", { email: formData.email, password: formData.password, callbackUrl: "/" });
       }
-    } catch (err: any) { toast("ERRO NO SISTEMA", err.message, "error"); }
-    finally { setLoading(false); }
+    } catch (err: any) { 
+      toast("ERRO NO SISTEMA", err.message, "error"); 
+    } finally { 
+      setLoading(false); 
+    }
   };
 
   return (
@@ -200,7 +205,16 @@ function AuthContent() {
                 </div>
               )}
 
-              <TerminalInput label="Endereço Email" icon={Mail} placeholder="user@dominio.com" value={formData.email} onChange={(e:any) => updateField("email", e.target.value)} error={errors.email} />
+              {/* Usamos type="text" para não obrigar ao formato @ se for admin */}
+              <TerminalInput 
+                label="Utilizador ou Email" 
+                icon={Mail} 
+                type="text"
+                placeholder="Ex: admin ou user@email.com" 
+                value={formData.email} 
+                onChange={(e:any) => updateField("email", e.target.value)} 
+                error={errors.email} 
+              />
 
               <div className="relative">
                 <TerminalInput label="Chave de Acesso" icon={Lock} type={showPassword ? "text" : "password"} placeholder="••••••••" value={formData.password} onChange={(e:any) => updateField("password", e.target.value)} />
@@ -234,7 +248,9 @@ function AuthContent() {
 export default function AuthPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#05070a] p-4 font-sans">
-      <Suspense fallback={<div className="text-blue-600 italic font-black animate-pulse">BOOTING...</div>}><AuthContent /></Suspense>
+      <Suspense fallback={<div className="text-blue-600 italic font-black animate-pulse">BOOTING...</div>}>
+        <AuthContent />
+      </Suspense>
     </div>
   );
 }
