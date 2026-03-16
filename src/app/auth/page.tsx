@@ -12,10 +12,16 @@ import { signIn } from "next-auth/react";
 import Swal from "sweetalert2";
 
 // ========================================================
-// 1. LÓGICA DE VALIDAÇÃO
+// 1. LÓGICA DE VALIDAÇÃO E CONFIGS
 // ========================================================
+const countryPrefixes = [
+  { code: "+351", country: "PT" },
+  { code: "+34", country: "ES" },
+  { code: "+33", country: "FR" },
+  { code: "+44", country: "UK" },
+];
+
 const validateEmail = (email: string) => {
-  // Permite "admin" ou o formato normal de email
   if (email.toLowerCase() === "admin") return true;
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 };
@@ -89,7 +95,7 @@ function AuthContent() {
   const [errors, setErrors] = useState<any>({});
 
   const [formData, setFormData] = useState({
-    name: "", email: "", phone: "", password: "", confirmPassword: ""
+    name: "", email: "", phone: "", prefix: "+351", password: "", confirmPassword: ""
   });
 
   useEffect(() => {
@@ -116,7 +122,7 @@ function AuthContent() {
     if (!validateEmail(formData.email)) newErrors.email = "Utilizador ou Email Inválido";
     if (!isLogin) {
       if (!formData.name) newErrors.name = "Nome obrigatório";
-      if (formData.phone.length < 9) newErrors.phone = "Número incompleto (9 dígitos)";
+      if (formData.phone.length < 7) newErrors.phone = "Número incompleto";
       if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "As passwords não coincidem";
     }
     setErrors(newErrors);
@@ -138,15 +144,9 @@ function AuthContent() {
       setLoading(false);
     } else {
       toast("SUCESSO", "A entrar em TSPneus...", "success");
-      
-      // Forçamos o refresh para o middleware reconhecer o cookie de sessão imediatamente
       router.refresh();
-
-      // Definir destino: se for admin ou admin@local.com, vai para /admin
       const userMail = formData.email.toLowerCase();
       const destination = (userMail === "admin" || userMail === "admin@local.com") ? "/admin" : "/";
-
-      // Delay de 500ms para garantir que o refresh e o cookie estão prontos antes da navegação
       setTimeout(() => {
         router.push(destination);
       }, 500);
@@ -160,10 +160,29 @@ function AuthContent() {
 
     setLoading(true);
     try {
-      const res = await registerUser(formData);
+      // CONCATENA O PREFIXO ANTES DE ENVIAR
+      const fullPhone = `${formData.prefix}${formData.phone}`;
+      
+      const res = await registerUser({
+        ...formData,
+        phone: fullPhone
+      });
+      
       if (res?.id) {
-          toast("CONTA CRIADA", "Bem-vindo ao TS Pneus.", "success");
-          await signIn("credentials", { email: formData.email, password: formData.password, callbackUrl: "/" });
+        const loginRes = await signIn("credentials", { 
+          email: formData.email, 
+          password: formData.password, 
+          redirect: false 
+        });
+
+        if (loginRes?.error) {
+          toast("AVISO", "Conta criada, faça login manualmente.", "warning");
+          setIsLogin(true);
+        } else {
+          toast("BEM-VINDO", "Conta criada e sessão iniciada!", "success");
+          router.refresh();
+          setTimeout(() => { router.push("/"); }, 800);
+        }
       }
     } catch (err: any) { 
       toast("ERRO NO SISTEMA", err.message, "error"); 
@@ -199,25 +218,50 @@ function AuthContent() {
             
             <div className="space-y-4">
               {!isLogin && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <TerminalInput label="Nome Completo" icon={User} placeholder="INTRODUZA NOME" value={formData.name} onChange={(e:any) => updateField("name", e.target.value)} error={errors.name} />
-                  <TerminalInput label="Telemóvel" icon={Phone} placeholder="9XXXXXXXX" value={formData.phone} onChange={handlePhoneChange} error={errors.phone} />
-                </div>
+                <>
+                  <TerminalInput label="Nome" icon={User} placeholder="Seu nome" value={formData.name} onChange={(e:any) => updateField("name", e.target.value)} error={errors.name} />
+                  
+                  {/* CAMPO TELEMÓVEL COM PREFIXO */}
+                  <div className="flex flex-col gap-1">
+                    <p className={`text-[9px] font-black uppercase mb-1 ${errors.phone ? 'text-red-500' : 'text-blue-600'}`}>Telemóvel Internacional</p>
+                    <div className="flex gap-2">
+                      <select 
+                        value={formData.prefix}
+                        onChange={(e) => updateField("prefix", e.target.value)}
+                        className="bg-[#14171c] border border-white/5 p-3 text-white text-xs font-bold outline-none focus:border-blue-600 w-24 appearance-none"
+                      >
+                        {countryPrefixes.map(p => (
+                          <option key={p.code} value={p.code} className="bg-[#0d0f14]">{p.country} ({p.code})</option>
+                        ))}
+                      </select>
+                      <div className={`flex-1 bg-[#14171c] border ${errors.phone ? 'border-red-500/50' : 'border-white/5'} p-3 focus-within:border-blue-600 transition-all flex items-center gap-2`}>
+                        <Phone size={14} className="text-slate-600" />
+                        <input 
+                          type="tel"
+                          placeholder="Número"
+                          value={formData.phone}
+                          onChange={handlePhoneChange}
+                          className="bg-transparent w-full text-white text-xs outline-none font-bold placeholder:text-slate-700"
+                        />
+                      </div>
+                    </div>
+                    {errors.phone && <span className="text-[8px] text-red-500 font-bold uppercase italic">{errors.phone}</span>}
+                  </div>
+                </>
               )}
 
-              {/* Usamos type="text" para não obrigar ao formato @ se for admin */}
               <TerminalInput 
-                label="Utilizador ou Email" 
+                label="Email" 
                 icon={Mail} 
                 type="text"
-                placeholder="Ex: admin ou user@email.com" 
+                placeholder="Seu email" 
                 value={formData.email} 
                 onChange={(e:any) => updateField("email", e.target.value)} 
                 error={errors.email} 
               />
 
               <div className="relative">
-                <TerminalInput label="Chave de Acesso" icon={Lock} type={showPassword ? "text" : "password"} placeholder="••••••••" value={formData.password} onChange={(e:any) => updateField("password", e.target.value)} />
+                <TerminalInput label="Palavra-passe" icon={Lock} type={showPassword ? "text" : "password"} placeholder="••••••••" value={formData.password} onChange={(e:any) => updateField("password", e.target.value)} />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-8 text-slate-600 hover:text-white transition-colors">
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -225,14 +269,14 @@ function AuthContent() {
 
               {!isLogin && (
                 <div className="space-y-4 animate-in slide-in-from-bottom-2">
-                  <TerminalInput label="Confirmar Chave" icon={ShieldCheck} type={showPassword ? "text" : "password"} placeholder="••••••••" value={formData.confirmPassword} onChange={(e:any) => updateField("confirmPassword", e.target.value)} error={errors.confirmPassword} />
+                  <TerminalInput label="Confirmar palavra-passe" icon={ShieldCheck} type={showPassword ? "text" : "password"} placeholder="••••••••" value={formData.confirmPassword} onChange={(e:any) => updateField("confirmPassword", e.target.value)} error={errors.confirmPassword} />
                   <PasswordStrengthDisplay password={formData.password} />
                 </div>
               )}
             </div>
 
             <button onClick={isLogin ? onLogin : onRegister} disabled={loading} className="w-full bg-blue-600 hover:bg-white text-white hover:text-black p-5 font-black uppercase italic tracking-tighter transition-all flex items-center justify-center gap-4 group disabled:opacity-50">
-              {loading ? "A PROCESSAR..." : isLogin ? "INICIAR SESSÃO" : "FINALIZAR REGISTO"} <ArrowRight size={20} className="group-hover:translate-x-1" />
+              {loading ? "A PROCESSAR..." : isLogin ? "INICIAR SESSÃO" : "REGISTAR"} <ArrowRight size={20} className="group-hover:translate-x-1" />
             </button>
 
             <p className="text-center text-slate-500 font-bold uppercase text-[10px] tracking-widest cursor-pointer hover:text-blue-600 transition-colors" onClick={() => { setIsLogin(!isLogin); setErrors({}); }}>

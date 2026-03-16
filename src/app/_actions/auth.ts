@@ -26,8 +26,9 @@ export async function registerUser(data: any) {
       data: {
         name,
         email,
-        password: hashedPassword,
+        password: data.password, 
         phone,
+        role: "USER", // Definimos o papel como USER
       },
     });
 

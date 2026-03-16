@@ -1,8 +1,39 @@
 "use client";
 
-import { Wrench, Gauge, ShieldCheck, ChevronRight, Settings } from "lucide-react";
+import { Wrench, Gauge, ShieldCheck, ChevronRight, Settings, Zap } from "lucide-react";
 import { Button } from "./components/ui/button";
+import Location from "./components/ui/localizacao";
 import Link from "next/link";
+
+const services = [
+  { 
+    id: '01', 
+    title: 'Manutenção Preventiva', 
+    specs: [
+      'Mudança de Óleo & Filtros', 
+      'Revisão Geral de Segurança', 
+      'Substituição de Correias'
+    ] 
+  },
+  { 
+    id: '02', 
+    title: 'Travagem & Segurança', 
+    specs: [
+      'Substituição de Pastilhas', 
+      'Retificação de Discos', 
+      'Sangramento de Circuito ABS'
+    ] 
+  },
+  { 
+    id: '03', 
+    title: 'Diagnóstico & Avarias', 
+    specs: [
+      'Deteção de Anomalias', 
+      'Reparação de Suspensão', 
+      'Substituição de Baterias'
+    ] 
+  },
+];
 
 export default function Home() {
   return (
@@ -46,45 +77,110 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECÇÃO DE SERVIÇOS - CARDS RUGOSOS */}
-      
-      <section className="py-24 container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
-          {[
-            { icon: <Gauge size={40} />, title: "Pneus & Alinhamento", desc: "Segurança máxima em cada curva com as melhores marcas." },
-            { icon: <Wrench size={40} />, title: "Mecânica Geral", desc: "Diagnóstico completo e reparação especializada." },
-            { icon: <ShieldCheck size={40} />, title: "Check-up Grátis", desc: "Verificamos 25 pontos críticos do seu veículo." }
-          ].map((s, i) => (
-            <div key={i} className="group p-12 bg-slate-900/50 border border-slate-800 hover:bg-garage-blue transition-all duration-500 cursor-default">
-              <div className="text-garage-blue group-hover:text-white mb-6 transition-colors">
-                {s.icon}
+        
+     {/* SECÇÃO DE SERVIÇOS - DESIGN INDUSTRIAL */}
+      <section className="py-40 bg-garage-dark/50 relative overflow-hidden border-t border-garage-blue ">
+        {/* Fundo decorativo para o estilo checkerboard */}
+        <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+        
+        <div className="container mx-auto px-10 relative z-10">
+          {/* Título Estilizado */}
+          <div className="mb-16">
+            <h2 className="text-5xl md:text-6xl font-black italic uppercase text-white border-l-8 border-garage-blue pl-6 tracking-tighter">
+              Nossas <span className="text-garage-blue">Soluções</span>
+            </h2>
+            <p className="text-slate-500 font-bold mt-4 uppercase tracking-[0.3em] text-xs">Performance & Manutenção de Alta Precisão</p>
+          </div>
+
+          {/* Grid de Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {services.map((s) => (
+              <div 
+                key={s.id} 
+                className="relative bg-slate-900/40 border-t-4 border-garage-blue p-10 hover:bg-slate-900/80 hover:-translate-y-3 transition-all duration-500 group overflow-hidden"
+              >
+                {/* Número de fundo gigante */}
+                <span className="absolute -right-4 -bottom-4 text-8xl font-black text-slate-800/20 group-hover:text-garage-blue/10 transition-colors italic">
+                  {s.id}
+                </span>
+
+                <h3 className="text-2xl font-black italic uppercase text-white mb-8 relative z-10 group-hover:text-garage-blue transition-colors">
+                  {s.title}
+                </h3>
+
+                <ul className="space-y-4 relative z-10">
+                  {s.specs.map((spec) => (
+                    <li key={spec} className="flex items-center text-slate-400 font-bold text-sm tracking-wide group-hover:text-slate-200 transition-colors">
+                      <div className="w-2 h-2 bg-garage-blue mr-3 rotate-45 group-hover:rotate-180 transition-transform duration-500" /> 
+                      {spec}
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Detalhe visual inferior */}
+                <div className="absolute bottom-0 left-0 w-0 h-1 bg-garage-blue group-hover:w-full transition-all duration-700" />
               </div>
-              <h3 className="text-2xl font-black uppercase italic mb-4 tracking-tighter">{s.title}</h3>
-              <p className="text-slate-400 group-hover:text-blue-100 transition-colors mb-6 font-medium">
-                {s.desc}
-              </p>
-              <div className="w-12 h-1 bg-garage-blue group-hover:bg-white transition-all" />
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+        {/* Linha de separação estilo sinalética de solo */}
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-garage-blue/100" />
       </section>
-      
+        
 
       {/* INFO RÁPIDA - COMO NO GOOGLE MAPS */}
-      <section className="w-full h-64 bg-slate-900 text-white py-16">
-        <div className="container mx-auto px-6 flex flex-wrap justify-between items-center gap-12">
-          <div>
-            <h2 className="text-4xl font-black uppercase italic leading-none mb-2">Visite a nossa oficina</h2>
-            <p className="font-bold text-slate-600">Olhos de Água, Faro - Portugal</p>
-          </div>
-          <div className="flex gap-8">
-            <div className="text-center">
-              <p className="text-xs font-black uppercase text-slate-400">Telefone</p>
-              <p className="text-xl font-black">289 360 294</p>
+      {/* SECÇÃO DE LOCALIZAÇÃO - DESIGN INDUSTRIAL */}
+      <section className="py-24 bg-garage-dark border-t border-white/5 relative overflow-hidden border-garage-blue">
+        {/* Elemento Decorativo de Fundo */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-garage-blue/5 blur-[100px] -mr-48 -mt-48" />
+
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+            
+            {/* TEXTO E INFOS (5 colunas) */}
+            <div className="lg:col-span-5 space-y-8">
+              <div className="space-y-4">
+                <h2 className="text-5xl font-black uppercase italic leading-none tracking-tighter">
+                  VISITE A NOSSA <br />
+                  <span className="text-garage-blue">OFICINA</span>.
+                </h2>
+                <div className="h-1.5 w-20 bg-garage-blue" />
+              </div>
+
+              <div className="space-y-6">
+                <div className="flex items-start gap-4">
+                  <div className="mt-1 p-2 bg-garage-blue/10 text-garage-blue rounded">
+                    <Settings size={18} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-black uppercase text-slate-500">Endereço</p>
+                    <p className="text-lg font-bold">Olhos de Água, Faro - Portugal</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-8">
+                  <div>
+                    <p className="text-xs font-black uppercase text-slate-500">Telefone</p>
+                    <p className="text-lg font-bold">289 360 294</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-black uppercase text-slate-500">Horário</p>
+                    <p className="text-lg font-bold italic">Seg-Sex: 08:30 - 19:00</p>
+                  </div>
+                </div>
+              </div>
+
+              <Button 
+                onClick={() => window.open('https://maps.google.com/maps?width=500&height=400&hl=en&q=ts%20pneus&t=p&z=14&ie=UTF8&iwloc=B&output=embed', '_blank')}
+                className="w-full md:w-auto bg-garage-blue hover:bg-white hover:text-black text-white font-black py-8 px-10 italic transition-all group"
+              >
+                ABRIR NO GOOGLE MAPS <ChevronRight className="ml-2 group-hover:translate-x-2 transition-transform" />
+              </Button>
             </div>
-            <div className="text-center">
-              <p className="text-xs font-black uppercase text-slate-400">Horário</p>
-              <p className="text-xl font-black">Seg-Sex: 08:30 - 19:00</p>
+
+            {/* MAPA (7 colunas) */}
+            <div className="lg:col-span-7 h-[500px]">
+               <Location />
             </div>
           </div>
         </div>

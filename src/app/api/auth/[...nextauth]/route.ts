@@ -4,44 +4,66 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "../../../lib/prisma";
 
 export const authOptions: NextAuthOptions = {
-  session: { strategy: "jwt" },
+  // Define como a sessão é gerida (JSON Web Token)
+  session: { 
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 dias
+  },
   providers: [
     CredentialsProvider({
-      name: "Admin Login",
+      name: "Credentials",
       credentials: {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        console.log("--- TENTATIVA DE LOGIN ---");
+        console.log("--- 🏁 TENTATIVA DE LOGIN ---");
         
-        // 1. FORÇAR ENTRADA (Para não dependeres da BD enquanto corriges o Prisma)
-        if (credentials?.email === "admin@local.com" && credentials?.password === "Admin123") {
-          console.log("✅ LOGIN MESTRE DETETADO");
+        if (!credentials?.email || !credentials?.password) {
+          console.log("❌ Campos vazios.");
+          return null;
+        }
+
+        // Converter para minúsculas para evitar erros de digitação
+        const emailInput = credentials.email.toLowerCase();
+        const passwordInput = credentials.password;
+
+        // 1. LOGIN MESTRE (HARDCODED)
+        if ((emailInput === "admin" || emailInput === "admin@local.com") && passwordInput === "Admin123") {
+          console.log("✅ LOGIN Administrador DETETADO");
           return {
-            id: "1",
+            id: "admin-id-01",
             name: "Administrador",
             email: "admin@local.com",
             role: "ADMIN",
           };
         }
 
-        // 2. TENTAR BASE DE DADOS (Se o de cima falhar)
+        // 2. BUSCA NA BASE DE DADOS
         try {
           const user = await prisma.user.findUnique({
-            where: { email: credentials?.email },
+            where: { email: emailInput },
           });
 
-          if (user && user.password === credentials?.password) {
+          if (!user) {
+            console.log("❌ Utilizador não encontrado na BD:", emailInput);
+            return null;
+          }
+
+          // Comparação direta de password (conforme o teu registo atual)
+          if (user.password === passwordInput) {
+            console.log("✅ Login realizado com sucesso via BD");
             return {
               id: user.id.toString(),
               email: user.email,
               name: user.name,
-              role: (user as any).role || "ADMIN",
+              role: user.role || "USER", // Garante que tem um role
             };
+          } else {
+            console.log("❌ Password incorreta para o utilizador:", emailInput);
           }
         } catch (err) {
-          console.error("Erro ao ligar à BD:", err);
+          console.error("❌ Erro crítico ao ligar ao Prisma:", err);
         }
 
         return null;
@@ -49,6 +71,7 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   callbacks: {
+    // Guarda o ID e o ROLE no Token
     async jwt({ token, user }) {
       if (user) {
         token.role = (user as any).role;
@@ -56,6 +79,7 @@ export const authOptions: NextAuthOptions = {
       }
       return token;
     },
+    // Passa o ID e o ROLE do Token para a Sessão (acessível no Front-end)
     async session({ session, token }) {
       if (session.user) {
         (session.user as any).role = token.role;
@@ -64,7 +88,12 @@ export const authOptions: NextAuthOptions = {
       return session;
     }
   },
-  pages: { signIn: "/auth" },
+  pages: { 
+    signIn: "/auth", // Onde o utilizador é mandado se não estiver logado
+    error: "/auth",  // Onde o utilizador é mandado se o login falhar
+  },
+  // Chave secreta necessária para assinar os cookies da sessão
+  secret: process.env.NEXTAUTH_SECRET || "chave-secreta-para-escola-123",
 };
 
 const handler = NextAuth(authOptions);
