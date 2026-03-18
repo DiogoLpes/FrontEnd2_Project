@@ -5,39 +5,32 @@ import bcrypt from "bcryptjs";
 
 export async function registerUser(data: any) {
   try {
-    // Removemos o 'plate' daqui, pois não vem mais do formulário
     const { name, email, password, phone } = data;
 
-    // 1. Verificar se o e-mail já está registado
     const userExists = await prisma.user.findUnique({
-      where: { email },
+      where: { email: email.toLowerCase() },
     });
 
     if (userExists) {
       throw new Error("Este e-mail já está associado a uma conta.");
     }
 
-    // 2. Encriptar a password
+    // Encriptar a password antes de guardar
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 3. Criar apenas o utilizador
-    // Removemos a parte de 'vehicles: { create: ... }'
     const user = await prisma.user.create({
       data: {
         name,
-        email,
-        password: data.password, 
+        email: email.toLowerCase(),
+        password: hashedPassword, 
         phone,
-        role: "USER", // Definimos o papel como USER
+        role: "USER",
       },
     });
 
-    // Retornamos o utilizador (sem veículos por enquanto)
     return user;
-
   } catch (error: any) {
     console.error("Erro no registo:", error);
-    // Se for um erro do Prisma ou um erro lançado por nós, passamos a mensagem
-    throw new Error(error.message || "Erro interno ao processar o registo.");
+    throw new Error(error.message || "Erro ao processar o registo.");
   }
 }

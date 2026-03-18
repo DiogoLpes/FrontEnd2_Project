@@ -2,12 +2,12 @@ import NextAuth from "next-auth";
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "../../../lib/prisma";
+import bcrypt from "bcryptjs"; 
 
 export const authOptions: NextAuthOptions = {
-  // Define como a sessão é gerida (JSON Web Token)
   session: { 
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 dias
+    maxAge: 30 * 24 * 60 * 60, 
   },
   providers: [
     CredentialsProvider({
@@ -19,81 +19,64 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         console.log("--- 🏁 TENTATIVA DE LOGIN ---");
         
-        if (!credentials?.email || !credentials?.password) {
-          console.log("❌ Campos vazios.");
-          return null;
-        }
+        if (!credentials?.email || !credentials?.password) return null;
 
-        // Converter para minúsculas para evitar erros de digitação
         const emailInput = credentials.email.toLowerCase();
         const passwordInput = credentials.password;
 
-        // 1. LOGIN MESTRE (HARDCODED)
         if ((emailInput === "admin" || emailInput === "admin@local.com") && passwordInput === "Admin123") {
-          console.log("✅ LOGIN Administrador DETETADO");
-          return {
-            id: "admin-id-01",
-            name: "Administrador",
-            email: "admin@local.com",
-            role: "ADMIN",
-          };
+          return { id: "1", name: "Administrador", email: "admin@local.com", role: "ADMIN" };
         }
 
-        // 2. BUSCA NA BASE DE DADOS
         try {
           const user = await prisma.user.findUnique({
             where: { email: emailInput },
           });
 
           if (!user) {
-            console.log("❌ Utilizador não encontrado na BD:", emailInput);
+            console.log("❌ Utilizador não encontrado:", emailInput);
             return null;
           }
 
-          // Comparação direta de password (conforme o teu registo atual)
-          if (user.password === passwordInput) {
-            console.log("✅ Login realizado com sucesso via BD");
-            return {
+
+          const isPasswordValid = await bcrypt.compare(passwordInput, user.password);
+
+          if (isPasswordValid) {
+            console.log("✅ Login realizado com sucesso");
+            return {    
               id: user.id.toString(),
               email: user.email,
               name: user.name,
-              role: user.role || "USER", // Garante que tem um role
+              role: user.role || "USER",
             };
           } else {
-            console.log("❌ Password incorreta para o utilizador:", emailInput);
+            console.log("❌ Password incorreta para:", emailInput);
           }
         } catch (err) {
-          console.error("❌ Erro crítico ao ligar ao Prisma:", err);
+          console.error("❌ Erro Prisma:", err);
         }
-
         return null;
       }
     })
   ],
   callbacks: {
-    // Guarda o ID e o ROLE no Token
     async jwt({ token, user }) {
       if (user) {
-        token.role = (user as any).role;
         token.id = user.id;
+        token.role = (user as any).role;
       }
       return token;
     },
-    // Passa o ID e o ROLE do Token para a Sessão (acessível no Front-end)
     async session({ session, token }) {
-      if (session.user) {
-        (session.user as any).role = token.role;
+      if (session.user && token) {
         (session.user as any).id = token.id;
+        (session.user as any).role = token.role;
       }
-      return session;
+      return session; 
     }
   },
-  pages: { 
-    signIn: "/auth", // Onde o utilizador é mandado se não estiver logado
-    error: "/auth",  // Onde o utilizador é mandado se o login falhar
-  },
-  // Chave secreta necessária para assinar os cookies da sessão
-  secret: process.env.NEXTAUTH_SECRET || "chave-secreta-para-escola-123",
+  pages: { signIn: "/auth", error: "/auth" },
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
 const handler = NextAuth(authOptions);

@@ -6,6 +6,9 @@ datasource db {
   provider = "postgresql"
 }
 
+// ==========================================
+// UTILIZADORES
+// ==========================================
 model User {
   id        Int       @id @default(autoincrement())
   email     String    @unique
@@ -13,54 +16,69 @@ model User {
   password  String
   role      Role      @default(USER)
   phone     String?
-  vehicles  Vehicle[]
+  vehicles  Vehicle[] // Um user pode ter vários veículos
   createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
+// ==========================================
+// VEÍCULOS
+// ==========================================
 model Vehicle {
-  id        Int       @id @default(autoincrement())
-  plate     String    @unique
-  brand     String?
-  model     String?
+  id        Int           @id @default(autoincrement())
+  plate     String        @unique // Matrícula
+  brand     String?       // Marca
+  model     String?       // Modelo
   color     String?
   year      Int?
   fuel      FuelType?
   imageUrl  String?
-  owner     User      @relation(fields: [ownerId], references: [id])
-  ownerId   Int
-  services  Service[]
-  createdAt DateTime  @default(now())
+  
+  // Relacionamento com User (Alterado para userId)
+  user      User          @relation(fields: [userId], references: [id])
+  userId    Int
+  
+  services  Service[]     // Histórico de serviços deste veículo
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 }
 
+// ==========================================
+// SERVIÇOS / MANUTENÇÕES
+// ==========================================
 model Service {
   id          Int           @id @default(autoincrement())
   type        ServiceType
   description String?
   date        DateTime
-  mileage     Int?
+  mileage     Int?          // Quilometragem no momento do serviço
   price       Float?
   status      ServiceStatus @default(PENDENTE)
+  
+  // Relacionamento com Vehicle
   vehicle     Vehicle       @relation(fields: [vehicleId], references: [id])
   vehicleId   Int
+  
   createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
 
 // ==========================================
-// NOVO MODELO: STOCK DE PEÇAS
+// STOCK DE PEÇAS (LOJA/OFICINA)
 // ==========================================
 model Product {
   id          Int      @id @default(autoincrement())
   name        String
   category    String   // Ex: Pneus, Óleos, Travões
   quantity    Int      @default(0)
-  minStock    Int      @default(5) // Para alertas de stock baixo
+  minStock    Int      @default(5) // Alerta de stock baixo
   price       Float    // Preço de venda
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
 // ==========================================
-// ENUMS
+// ENUMS (DADOS PADRONIZADOS)
 // ==========================================
 
 enum Role {

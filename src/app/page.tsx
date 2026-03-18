@@ -4,6 +4,7 @@ import { Wrench, Gauge, ShieldCheck, ChevronRight, Settings, Zap } from "lucide-
 import { Button } from "./components/ui/button";
 import Location from "./components/ui/localizacao";
 import Link from "next/link";
+import { handleBookingClick } from "./_actions/booking";
 
 const services = [
   { 
@@ -61,12 +62,28 @@ export default function Home() {
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <Button size="lg" className="btn-industrial bg-garage-blue hover:bg-blue-700 text-white font-black px-10 h-16 text-xl transition-all hover:scale-105">
+              {/* BOTÃO COM LÓGICA (CENÁRIO A/B) */}
+              <Button 
+                onClick={async () => {
+
+                  await handleBookingClick();
+                }}
+                size="lg" 
+                className="btn-industrial bg-garage-blue hover:bg-blue-700 text-white font-black px-10 h-16 text-xl transition-all hover:scale-105"
+              >
                 MARCAR REVISÃO
               </Button>
-              <Button size="lg" variant="outline" className="btn-industrial border-2 border-white font-black px-10 h-16 text-xl hover:bg-white hover:text-black">
-                VER STATUS
-              </Button>
+
+              {/* LINK DIRETO PARA O STATUS */}
+              <Link href="/status">
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="btn-industrial border-2 border-white font-black px-10 h-16 text-xl hover:bg-white hover:text-black w-full"
+                >
+                  VER STATUS
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
