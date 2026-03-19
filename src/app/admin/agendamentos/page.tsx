@@ -10,7 +10,8 @@ import {
   AlertCircle,
   Wrench,
   Search,
-  Filter
+  Filter,
+  Printer
 } from "lucide-react";
 import Swal from "sweetalert2";
 
@@ -18,6 +19,7 @@ export default function AdminAgendamentos() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // 1. FUNÇÃO DE BUSCA DE DADOS
   const fetchServices = async () => {
     try {
       setLoading(true);
@@ -33,6 +35,44 @@ export default function AdminAgendamentos() {
 
   useEffect(() => { fetchServices(); }, []);
 
+  // 2. FUNÇÃO DE IMPRESSÃO (CORRIGIDA: O parâmetro chama-se 's')
+  const handlePrint = (s: any) => {
+    const printContent = `
+      <div style="font-family: sans-serif; padding: 40px; color: #000;">
+        <h1 style="text-transform: uppercase; font-style: italic; border-bottom: 2px solid #000; padding-bottom: 10px;">
+          TS PNEUS - Guia de Oficina
+        </h1>
+        <div style="display: flex; justify-content: space-between; margin-top: 30px;">
+          <div>
+            <p><strong>CLIENTE:</strong> ${s.vehicle?.user?.name || 'N/D'}</p>
+            <p><strong>VIATURA:</strong> ${s.vehicle?.brand} ${s.vehicle?.model}</p>
+            <p><strong>MATRÍCULA:</strong> ${s.vehicle?.plate}</p>
+          </div>
+          <div style="text-align: right;">
+            <p><strong>DATA:</strong> ${new Date(s.date).toLocaleDateString()}</p>
+            <p><strong>SERVIÇO:</strong> ${s.type}</p>
+            <p><strong>STATUS:</strong> ${s.status}</p>
+          </div>
+        </div>
+        <div style="margin-top: 40px; border: 1px solid #ccc; padding: 20px; min-height: 150px;">
+          <p><strong>DESCRIÇÃO DO TRABALHO:</strong></p>
+          <p>${s.description || "Sem notas adicionais."}</p>
+        </div>
+        <div style="margin-top: 60px; text-align: center; font-size: 10px; color: #666; border-top: 1px dashed #ccc; pt: 10px;">
+          <p>Documento gerado pelo sistema TS PNEUS PRO em ${new Date().toLocaleString()}</p>
+        </div>
+      </div>
+    `;
+
+    const win = window.open('', '_blank');
+    if (win) {
+      win.document.write(`<html><head><title>Imprimir - ${s.vehicle?.plate}</title></head><body>${printContent}</body></html>`);
+      win.document.close();
+      win.print();
+    }
+  };
+
+  // 3. FUNÇÃO DE ATUALIZAÇÃO DE STATUS
   const updateStatus = async (id: number, newStatus: string) => {
     try {
       const res = await fetch("/api/services", {
@@ -42,7 +82,6 @@ export default function AdminAgendamentos() {
       });
       
       if (res.ok) {
-        // Notificação rápida no canto
         const Toast = Swal.mixin({
           toast: true,
           position: 'top-end',
@@ -71,7 +110,7 @@ export default function AdminAgendamentos() {
           <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">Gestão de Fluxo e Reparações</p>
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex gap-2 text-white">
            <div className="bg-[#0d1117] border border-white/5 p-2 px-4 flex items-center gap-2 text-slate-400 text-xs">
               <Search size={14} />
               <input placeholder="Procurar matrícula..." className="bg-transparent outline-none uppercase font-bold w-32" />
@@ -84,16 +123,15 @@ export default function AdminAgendamentos() {
         {loading ? (
           <div className="text-center p-20 text-blue-600 animate-pulse font-black uppercase italic">A carregar agendamentos...</div>
         ) : (
-          services.map((s: any) => (
+          services.map((s: any) => ( // AQUI O 's' É DEFINIDO
             <div key={s.id} className="bg-[#0d1117] border border-white/5 p-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 hover:border-blue-600/30 transition-all group relative overflow-hidden">
               
-              {/* Barra lateral de estado */}
               <div className={`absolute left-0 top-0 h-full w-1 ${
                 s.status === 'PENDENTE' ? 'bg-orange-500' : s.status === 'EM_REPARACAO' ? 'bg-blue-500' : 'bg-green-500'
               }`}></div>
 
               {/* COLUNA 1: CLIENTE E VEÍCULO */}
-              <div className="flex gap-5 flex-1">
+              <div className="flex gap-5 flex-1 text-white">
                 <div className={`w-14 h-14 flex items-center justify-center border transition-colors ${
                   s.status === 'PENDENTE' ? 'bg-orange-500/5 border-orange-500/20 text-orange-500' : 
                   s.status === 'EM_REPARACAO' ? 'bg-blue-500/5 border-blue-500/20 text-blue-500' : 
@@ -112,9 +150,9 @@ export default function AdminAgendamentos() {
                   </div>
                   <div className="flex flex-col gap-1">
                     <p className="text-slate-400 text-[10px] font-bold uppercase flex items-center gap-1.5">
-                      <User size={12} className="text-slate-600" /> {s.vehicle?.owner?.name || "N/D"} 
+                      <User size={12} className="text-slate-600" /> {s.vehicle?.user?.name || "N/D"} 
                       <span className="text-slate-700 mx-1">|</span> 
-                      <span className="text-slate-500">{s.vehicle?.owner?.phone}</span>
+                      <span className="text-slate-500">{s.vehicle?.user?.phone || "S/ TEL"}</span>
                     </p>
                     <p className="text-slate-500 text-xs mt-2 italic line-clamp-1 border-l border-white/10 pl-3">
                       "{s.description || "Sem notas adicionais"}"
@@ -136,8 +174,8 @@ export default function AdminAgendamentos() {
                 </div>
               </div>
 
-              {/* COLUNA 3: AÇÕES (SELECT) */}
-              <div className="flex items-center gap-3 w-full lg:w-64">
+              {/* COLUNA 3: AÇÕES (SELECT + PRINT) */}
+              <div className="flex items-center gap-3 w-full lg:w-80">
                 <div className="flex-1 relative">
                   <select 
                     value={s.status}
@@ -153,6 +191,15 @@ export default function AdminAgendamentos() {
                     <Clock size={12} />
                   </div>
                 </div>
+                
+                {/* BOTÃO DE IMPRIMIR (CORRIGIDO: Passa o 's' do map) */}
+                <button 
+                  onClick={() => handlePrint(s)}
+                  className="p-3 bg-white/5 border border-white/10 text-slate-400 hover:bg-white hover:text-black transition-all rounded-sm shadow-lg"
+                  title="Imprimir Guia"
+                >
+                  <Printer size={18} />
+                </button>
               </div>
 
             </div>

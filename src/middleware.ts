@@ -6,19 +6,18 @@ export default withAuth(
     const token = req.nextauth.token;
     const isAdminPage = req.nextUrl.pathname.startsWith("/admin");
 
-    // Bloqueia acesso a /admin se o utilizador não tiver role ADMIN
     if (isAdminPage && token?.role !== "ADMIN") {
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
-
     return NextResponse.next();
   },
   {
     callbacks: {
+      // FORÇAR: Se não houver token, retorna false para qualquer rota no matcher
       authorized: ({ token }) => !!token,
     },
     pages: {
-      signIn: "/auth?mode=login",
+      signIn: "/auth", // Removi o query param para testar se ele vai para a página base
     },
   }
 );
@@ -27,7 +26,6 @@ export const config = {
   matcher: [
    "/dashboard/:path*",
    "/agenda/:path*",
-   "/Tracking/:path*",
    "/admin/:path*" 
   ] 
 };

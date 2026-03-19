@@ -7,7 +7,7 @@ export async function GET() {
       include: {
         vehicle: {
           include: {
-            owner: true // Traz os dados do cliente dono do carro
+            user: true // Traz os dados do cliente dono do carro
           }
         }
       },

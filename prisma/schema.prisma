@@ -77,6 +77,20 @@ model Product {
   updatedAt   DateTime @updatedAt
 }
 
+model Booking {
+  id           String   @id @default(cuid())
+  plate        String   // Matrícula da viatura
+  service      String   // Categoria (PNEUS, REVISAO, etc)
+  subService   String?  // Opção detalhada (Michelin, 5W30, etc)
+  extraInfo    String?  @db.Text
+  date         String   // Data escolhida
+  hour         String   // Hora escolhida
+  status       String   @default("PENDENTE") // PENDENTE -> EM_MANUTENCAO -> CONCLUIDO
+  description  String?  @default("Aguardando receção da viatura") // O que aparece no "Status"
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
 // ==========================================
 // ENUMS (DADOS PADRONIZADOS)
 // ==========================================
