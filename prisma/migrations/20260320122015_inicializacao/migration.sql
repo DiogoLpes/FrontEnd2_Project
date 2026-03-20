@@ -8,7 +8,7 @@ CREATE TYPE "FuelType" AS ENUM ('GASOLINA', 'DIESEL', 'HIBRIDO', 'ELETRICO');
 CREATE TYPE "ServiceType" AS ENUM ('REVISAO', 'PNEUS', 'OLEO', 'TRAVOES', 'DIAGNOSTICO', 'OUTRO');
 
 -- CreateEnum
-CREATE TYPE "ServiceStatus" AS ENUM ('PENDENTE', 'EM_REPARACAO', 'CONCLUIDO');
+CREATE TYPE "ServiceStatus" AS ENUM ('SOLICITADO', 'ORCAMENTADO', 'EM_REPARACAO', 'CONCLUIDO', 'CANCELADO');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -19,7 +19,6 @@ CREATE TABLE "User" (
     "role" "Role" NOT NULL DEFAULT 'USER',
     "phone" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -34,9 +33,8 @@ CREATE TABLE "Vehicle" (
     "year" INTEGER,
     "fuel" "FuelType",
     "imageUrl" TEXT,
-    "userId" INTEGER NOT NULL,
+    "ownerId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Vehicle_pkey" PRIMARY KEY ("id")
 );
@@ -46,10 +44,9 @@ CREATE TABLE "Service" (
     "id" SERIAL NOT NULL,
     "type" "ServiceType" NOT NULL,
     "description" TEXT,
-    "date" TIMESTAMP(3) NOT NULL,
-    "mileage" INTEGER,
+    "date" TIMESTAMP(3),
     "price" DOUBLE PRECISION,
-    "status" "ServiceStatus" NOT NULL DEFAULT 'PENDENTE',
+    "status" "ServiceStatus" NOT NULL DEFAULT 'SOLICITADO',
     "vehicleId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -78,7 +75,7 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX "Vehicle_plate_key" ON "Vehicle"("plate");
 
 -- AddForeignKey
-ALTER TABLE "Vehicle" ADD CONSTRAINT "Vehicle_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Vehicle" ADD CONSTRAINT "Vehicle_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Service" ADD CONSTRAINT "Service_vehicleId_fkey" FOREIGN KEY ("vehicleId") REFERENCES "Vehicle"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

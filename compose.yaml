@@ -2,12 +2,15 @@ services:
   db:
     image: postgres:15-alpine
     container_name: ts-pneus-db
-    env_file:
-      - .env
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin123
+      - POSTGRES_DB=tspneus
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    restart: always
 
 volumes:
   postgres_data:

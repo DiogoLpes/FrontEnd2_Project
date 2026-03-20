@@ -16,85 +16,77 @@ model User {
   password  String
   role      Role      @default(USER)
   phone     String?
-  vehicles  Vehicle[] // Um user pode ter vários veículos
+  vehicles  Vehicle[]
   createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+}
+
+model Booking {
+  id         String   @id @default(cuid())
+  plate      String
+  service    String
+  subService String?
+  extraInfo  String?
+  date       String
+  hour       String
+  status     String   @default("PENDENTE")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 // ==========================================
 // VEÍCULOS
 // ==========================================
 model Vehicle {
-  id        Int           @id @default(autoincrement())
-  plate     String        @unique // Matrícula
-  brand     String?       // Marca
-  model     String?       // Modelo
-  color     String?
-  year      Int?
-  fuel      FuelType?
-  imageUrl  String?
-  
-  // Relacionamento com User (Alterado para userId)
-  user      User          @relation(fields: [userId], references: [id])
-  userId    Int
-  
-  services  Service[]     // Histórico de serviços deste veículo
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  id     Int    @id @default(autoincrement())
+  plate  String @unique
+  brand  String
+  model  String
+  color  String
+  year   Int
+  fuel   String
+  userId Int
+  user   User   @relation(fields: [userId], references: [id])
+
+  // --- ADICIONADO PARA RESOLVER O ERRO ---
+  services Service[]
 }
 
 // ==========================================
-// SERVIÇOS / MANUTENÇÕES
+// SERVIÇOS (O teu novo fluxo de Orçamentos)
 // ==========================================
 model Service {
   id          Int           @id @default(autoincrement())
   type        ServiceType
   description String?
-  date        DateTime
-  mileage     Int?          // Quilometragem no momento do serviço
+  date        DateTime?
   price       Float?
-  status      ServiceStatus @default(PENDENTE)
-  
-  // Relacionamento com Vehicle
-  vehicle     Vehicle       @relation(fields: [vehicleId], references: [id])
-  vehicleId   Int
-  
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  status      ServiceStatus @default(SOLICITADO)
+
+  // Relação com Veículo
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
+  vehicleId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // ==========================================
-// STOCK DE PEÇAS (LOJA/OFICINA)
+// STOCK DE PEÇAS
 // ==========================================
 model Product {
-  id          Int      @id @default(autoincrement())
-  name        String
-  category    String   // Ex: Pneus, Óleos, Travões
-  quantity    Int      @default(0)
-  minStock    Int      @default(5) // Alerta de stock baixo
-  price       Float    // Preço de venda
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model Booking {
-  id           String   @id @default(cuid())
-  plate        String   // Matrícula da viatura
-  service      String   // Categoria (PNEUS, REVISAO, etc)
-  subService   String?  // Opção detalhada (Michelin, 5W30, etc)
-  extraInfo    String?  @db.Text
-  date         String   // Data escolhida
-  hour         String   // Hora escolhida
-  status       String   @default("PENDENTE") // PENDENTE -> EM_MANUTENCAO -> CONCLUIDO
-  description  String?  @default("Aguardando receção da viatura") // O que aparece no "Status"
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  name      String
+  category  String // Ex: Pneus, Óleos, Travões
+  quantity  Int      @default(0)
+  minStock  Int      @default(5)
+  price     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // ==========================================
-// ENUMS (DADOS PADRONIZADOS)
+// ENUMS
 // ==========================================
-
 enum Role {
   USER
   ADMIN
@@ -117,7 +109,9 @@ enum ServiceType {
 }
 
 enum ServiceStatus {
-  PENDENTE
-  EM_REPARACAO
-  CONCLUIDO
+  SOLICITADO // Cliente enviou o pedido
+  ORCAMENTADO // Admin definiu preço e data
+  EM_REPARACAO // Carro em mãos
+  CONCLUIDO // Carro pronto
+  CANCELADO // Recusado
 }

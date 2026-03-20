@@ -1,6 +1,6 @@
-import prisma from "@/app/lib/prisma";
+import { prisma } from "../lib/prisma"; // Ajusta se o teu for ../lib/prisma
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/lib/auth"; // Verifica se o caminho está certo no teu projeto
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"; // Ajusta o caminho do teu authOptions
 import { redirect } from "next/navigation";
 import DashboardClient from "./DashboardClient";
 
@@ -8,11 +8,10 @@ export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.email) {
-    redirect("/auth"); // Manda para o login se não houver sessão
+    redirect("/auth");
   }
 
-  // 1. BUSCA REAL NO POSTGRES (Via Prisma)
-  // Isto garante que quando fazes refresh, os carros estão lá!
+  // Busca o utilizador e os seus veículos no Postgres
   const userWithVehicles = await prisma.user.findUnique({
     where: { email: session.user.email },
     include: { 
@@ -22,11 +21,13 @@ export default async function DashboardPage() {
     }
   });
 
-  // 2. PASSAMOS OS DADOS PARA A INTERFACE (Client Component)
+  // Sanitização de dados para evitar erro de serialização de Datas
+  const vehicles = JSON.parse(JSON.stringify(userWithVehicles?.vehicles || []));
+
   return (
     <DashboardClient 
       session={session} 
-      initialVehicles={JSON.parse(JSON.stringify(userWithVehicles?.vehicles || []))} 
+      userVehicles={vehicles} 
     />
   );
 }

@@ -11,7 +11,8 @@ import {
   Wrench,
   Search,
   Filter,
-  Printer
+  Printer,
+  Euro
 } from "lucide-react";
 import Swal from "sweetalert2";
 
@@ -19,7 +20,7 @@ export default function AdminAgendamentos() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. FUNÇÃO DE BUSCA DE DADOS
+  // 1. BUSCA DE DADOS
   const fetchServices = async () => {
     try {
       setLoading(true);
@@ -35,44 +36,70 @@ export default function AdminAgendamentos() {
 
   useEffect(() => { fetchServices(); }, []);
 
-  // 2. FUNÇÃO DE IMPRESSÃO (CORRIGIDA: O parâmetro chama-se 's')
-  const handlePrint = (s: any) => {
-    const printContent = `
-      <div style="font-family: sans-serif; padding: 40px; color: #000;">
-        <h1 style="text-transform: uppercase; font-style: italic; border-bottom: 2px solid #000; padding-bottom: 10px;">
-          TS PNEUS - Guia de Oficina
-        </h1>
-        <div style="display: flex; justify-content: space-between; margin-top: 30px;">
+  // 2. FUNÇÃO: DAR ORÇAMENTO (MODAL)
+  const handleDarOrcamento = async (serviceId: number) => {
+    const { value: formValues } = await Swal.fire({
+      title: '<span class="text-white font-black italic uppercase tracking-tighter">Enviar Orçamento</span>',
+      background: "#0d1117",
+      color: "#fff",
+      html: `
+        <div class="flex flex-col gap-4 p-2 text-left">
           <div>
-            <p><strong>CLIENTE:</strong> ${s.vehicle?.user?.name || 'N/D'}</p>
-            <p><strong>VIATURA:</strong> ${s.vehicle?.brand} ${s.vehicle?.model}</p>
-            <p><strong>MATRÍCULA:</strong> ${s.vehicle?.plate}</p>
+            <label class="text-[10px] font-black uppercase text-blue-500 tracking-widest">Valor do Serviço (€)</label>
+            <input id="swal-price" type="number" step="0.01" class="swal2-input !m-0 !mt-1 !w-full !bg-black/40 !border-white/10 !text-white !text-sm focus:!border-blue-600 outline-none" placeholder="Ex: 50.00">
           </div>
-          <div style="text-align: right;">
-            <p><strong>DATA:</strong> ${new Date(s.date).toLocaleDateString()}</p>
-            <p><strong>SERVIÇO:</strong> ${s.type}</p>
-            <p><strong>STATUS:</strong> ${s.status}</p>
+          <div>
+            <label class="text-[10px] font-black uppercase text-blue-500 tracking-widest">Data Sugerida</label>
+            <input id="swal-date" type="datetime-local" class="swal2-input !m-0 !mt-1 !w-full !bg-black/40 !border-white/10 !text-white !text-sm focus:!border-blue-600 outline-none">
           </div>
         </div>
-        <div style="margin-top: 40px; border: 1px solid #ccc; padding: 20px; min-height: 150px;">
-          <p><strong>DESCRIÇÃO DO TRABALHO:</strong></p>
-          <p>${s.description || "Sem notas adicionais."}</p>
-        </div>
-        <div style="margin-top: 60px; text-align: center; font-size: 10px; color: #666; border-top: 1px dashed #ccc; pt: 10px;">
-          <p>Documento gerado pelo sistema TS PNEUS PRO em ${new Date().toLocaleString()}</p>
-        </div>
-      </div>
-    `;
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'ENVIAR PARA CLIENTE',
+      confirmButtonColor: '#2563eb',
+      cancelButtonText: 'VOLTAR',
+      cancelButtonColor: 'transparent',
+      preConfirm: () => {
+        const price = (document.getElementById('swal-price') as HTMLInputElement).value;
+        const date = (document.getElementById('swal-date') as HTMLInputElement).value;
+        if (!price || !date) {
+          Swal.showValidationMessage('Preenche o preço e a data para continuar!');
+        }
+        return { price, date };
+      }
+    });
 
-    const win = window.open('', '_blank');
-    if (win) {
-      win.document.write(`<html><head><title>Imprimir - ${s.vehicle?.plate}</title></head><body>${printContent}</body></html>`);
-      win.document.close();
-      win.print();
+    if (formValues) {
+      try {
+        const res = await fetch("/api/services", {
+          method: "PATCH",
+          body: JSON.stringify({ 
+            id: serviceId, 
+            status: "ORCAMENTADO", 
+            price: formValues.price, 
+            date: formValues.date 
+          }),
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (res.ok) {
+          Swal.fire({ 
+            icon: 'success', 
+            title: 'ORÇAMENTO DEFINIDO', 
+            text: `Valor de ${formValues.price}€ registado.`,
+            background: "#0d1117", 
+            color: "#fff",
+            timer: 2000
+          });
+          fetchServices();
+        }
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
 
-  // 3. FUNÇÃO DE ATUALIZAÇÃO DE STATUS
+  // 3. ATUALIZAÇÃO DE STATUS SIMPLES
   const updateStatus = async (id: number, newStatus: string) => {
     try {
       const res = await fetch("/api/services", {
@@ -98,6 +125,38 @@ export default function AdminAgendamentos() {
     }
   };
 
+  // 4. IMPRESSÃO DE GUIA
+  const handlePrint = (s: any) => {
+    const printContent = `
+      <div style="font-family: sans-serif; padding: 40px; color: #000;">
+        <h1 style="text-transform: uppercase; font-style: italic; border-bottom: 2px solid #000; padding-bottom: 10px;">TS PNEUS - Guia de Oficina</h1>
+        <div style="display: flex; justify-content: space-between; margin-top: 30px;">
+          <div>
+            <p><strong>CLIENTE:</strong> ${s.vehicle?.owner?.name || 'N/D'}</p>
+            <p><strong>VIATURA:</strong> ${s.vehicle?.brand} ${s.vehicle?.model}</p>
+            <p><strong>MATRÍCULA:</strong> ${s.vehicle?.plate}</p>
+            <p><strong>VALOR:</strong> ${s.price ? s.price + '€' : 'A definir'}</p>
+          </div>
+          <div style="text-align: right;">
+            <p><strong>DATA:</strong> ${s.date ? new Date(s.date).toLocaleDateString() : 'N/D'}</p>
+            <p><strong>SERVIÇO:</strong> ${s.type}</p>
+            <p><strong>STATUS:</strong> ${s.status}</p>
+          </div>
+        </div>
+        <div style="margin-top: 40px; border: 1px solid #ccc; padding: 20px; min-height: 150px;">
+          <p><strong>DESCRIÇÃO:</strong></p>
+          <p>${s.description || "Sem notas adicionais."}</p>
+        </div>
+      </div>
+    `;
+    const win = window.open('', '_blank');
+    if (win) {
+      win.document.write(`<html><head><title>Imprimir - ${s.vehicle?.plate}</title></head><body>${printContent}</body></html>`);
+      win.document.close();
+      win.print();
+    }
+  };
+
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
       
@@ -107,10 +166,10 @@ export default function AdminAgendamentos() {
           <h1 className="text-3xl font-black uppercase italic text-white tracking-tighter">
             Controlo de <span className="text-blue-600">Oficina</span>
           </h1>
-          <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">Gestão de Fluxo e Reparações</p>
+          <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">Painel Administrativo TS PNEUS</p>
         </div>
         
-        <div className="flex gap-2 text-white">
+        <div className="flex gap-2">
            <div className="bg-[#0d1117] border border-white/5 p-2 px-4 flex items-center gap-2 text-slate-400 text-xs">
               <Search size={14} />
               <input placeholder="Procurar matrícula..." className="bg-transparent outline-none uppercase font-bold w-32" />
@@ -118,22 +177,26 @@ export default function AdminAgendamentos() {
         </div>
       </div>
 
-      {/* LISTAGEM DE SERVIÇOS */}
+      {/* LISTAGEM */}
       <div className="grid grid-cols-1 gap-4">
         {loading ? (
-          <div className="text-center p-20 text-blue-600 animate-pulse font-black uppercase italic">A carregar agendamentos...</div>
+          <div className="text-center p-20 text-blue-600 animate-pulse font-black uppercase italic">A sincronizar com a base de dados...</div>
         ) : (
-          services.map((s: any) => ( // AQUI O 's' É DEFINIDO
+          services.map((s: any) => (
             <div key={s.id} className="bg-[#0d1117] border border-white/5 p-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 hover:border-blue-600/30 transition-all group relative overflow-hidden">
               
+              {/* BARRA DE STATUS LATERAL */}
               <div className={`absolute left-0 top-0 h-full w-1 ${
-                s.status === 'PENDENTE' ? 'bg-orange-500' : s.status === 'EM_REPARACAO' ? 'bg-blue-500' : 'bg-green-500'
+                s.status === 'SOLICITADO' ? 'bg-white/20' : 
+                s.status === 'ORCAMENTADO' ? 'bg-orange-500' : 
+                s.status === 'EM_REPARACAO' ? 'bg-blue-500' : 'bg-green-500'
               }`}></div>
 
-              {/* COLUNA 1: CLIENTE E VEÍCULO */}
+              {/* COLUNA 1: VEÍCULO E CLIENTE */}
               <div className="flex gap-5 flex-1 text-white">
                 <div className={`w-14 h-14 flex items-center justify-center border transition-colors ${
-                  s.status === 'PENDENTE' ? 'bg-orange-500/5 border-orange-500/20 text-orange-500' : 
+                  s.status === 'SOLICITADO' ? 'bg-white/5 border-white/10 text-white' :
+                  s.status === 'ORCAMENTADO' ? 'bg-orange-500/5 border-orange-500/20 text-orange-500' : 
                   s.status === 'EM_REPARACAO' ? 'bg-blue-500/5 border-blue-500/20 text-blue-500' : 
                   'bg-green-500/5 border-green-500/20 text-green-500'
                 }`}>
@@ -144,55 +207,69 @@ export default function AdminAgendamentos() {
                     <span className="text-white font-black uppercase italic text-base tracking-tighter">
                       {s.vehicle?.brand} {s.vehicle?.model}
                     </span>
-                    <span className="bg-[#161b22] px-2 py-0.5 border border-white/10 text-blue-400 font-mono text-[10px] font-bold">
+                    <span className="bg-blue-600 px-2 py-0.5 text-white font-mono text-[10px] font-bold">
                       {s.vehicle?.plate}
                     </span>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <p className="text-slate-400 text-[10px] font-bold uppercase flex items-center gap-1.5">
-                      <User size={12} className="text-slate-600" /> {s.vehicle?.user?.name || "N/D"} 
-                      <span className="text-slate-700 mx-1">|</span> 
-                      <span className="text-slate-500">{s.vehicle?.user?.phone || "S/ TEL"}</span>
-                    </p>
-                    <p className="text-slate-500 text-xs mt-2 italic line-clamp-1 border-l border-white/10 pl-3">
-                      "{s.description || "Sem notas adicionais"}"
-                    </p>
-                  </div>
+                  <p className="text-slate-400 text-[10px] font-bold uppercase flex items-center gap-1.5">
+                    <User size={12} className="text-slate-600" /> {s.vehicle?.owner?.name || "N/D"} 
+                    <span className="text-slate-700 mx-1">|</span> 
+                    <span className="text-slate-500">{s.vehicle?.owner?.phone || "S/ TEL"}</span>
+                  </p>
+                  <p className="text-slate-500 text-xs mt-2 italic line-clamp-1 border-l border-white/10 pl-3">
+                    "{s.description || "Sem notas do cliente"}"
+                  </p>
                 </div>
               </div>
 
-              {/* COLUNA 2: TIPO E DATA */}
-              <div className="flex flex-row lg:flex-col items-center lg:items-end gap-6 lg:gap-1 border-t lg:border-t-0 border-white/5 pt-4 lg:pt-0 w-full lg:w-auto">
-                <div className="flex flex-col lg:items-end">
-                   <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-1">
+              {/* COLUNA 2: VALOR E DATA */}
+              <div className="flex flex-col lg:items-end min-w-[150px]">
+                  <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-1">
                     <Wrench size={10} /> {s.type}
-                   </span>
-                   <div className="flex items-center gap-2 text-white font-mono text-sm mt-1">
-                     <Calendar size={14} className="text-slate-600" />
-                     {new Date(s.date).toLocaleDateString()}
-                   </div>
-                </div>
+                  </span>
+                  
+                  {s.price ? (
+                    <div className="flex items-center gap-1 text-green-500 font-black text-xl italic tracking-tighter mt-1">
+                       {s.price.toFixed(2)}€
+                    </div>
+                  ) : (
+                    <div className="text-slate-600 text-[10px] font-bold uppercase mt-1">Preço pendente</div>
+                  )}
+
+                  <div className="flex items-center gap-2 text-slate-400 font-mono text-[10px] mt-1">
+                    <Calendar size={12} />
+                    {s.date ? new Date(s.date).toLocaleDateString() : 'A agendar'}
+                  </div>
               </div>
 
-              {/* COLUNA 3: AÇÕES (SELECT + PRINT) */}
+              {/* COLUNA 3: AÇÕES DINÂMICAS */}
               <div className="flex items-center gap-3 w-full lg:w-80">
-                <div className="flex-1 relative">
-                  <select 
-                    value={s.status}
-                    onChange={(e) => updateStatus(s.id, e.target.value)}
-                    className={`w-full bg-[#161b22] border border-white/10 text-[10px] font-black uppercase p-3 pr-8 outline-none cursor-pointer appearance-none transition-all focus:border-blue-600
-                      ${s.status === 'PENDENTE' ? 'text-orange-500' : s.status === 'EM_REPARACAO' ? 'text-blue-500' : 'text-green-500'}`}
-                  >
-                    <option value="PENDENTE">🟡 AGUARDAR</option>
-                    <option value="EM_REPARACAO">🔵 EM REPARAÇÃO</option>
-                    <option value="CONCLUIDO">🟢 CONCLUÍDO</option>
-                  </select>
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-600">
-                    <Clock size={12} />
-                  </div>
+                <div className="flex-1">
+                  {s.status === 'SOLICITADO' ? (
+                    <button 
+                      onClick={() => handleDarOrcamento(s.id)}
+                      className="w-full bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase p-3 transition-all flex items-center justify-center gap-2 group animate-pulse hover:animate-none"
+                    >
+                      <Euro size={14} className="group-hover:rotate-12 transition-transform" /> 
+                      Dar Orçamento
+                    </button>
+                  ) : (
+                    <div className="relative">
+                      <select 
+                        value={s.status}
+                        onChange={(e) => updateStatus(s.id, e.target.value)}
+                        className={`w-full bg-black/40 border border-white/10 text-[10px] font-black uppercase p-3 pr-8 outline-none cursor-pointer appearance-none transition-all focus:border-blue-600
+                          ${s.status === 'ORCAMENTADO' ? 'text-orange-500' : s.status === 'EM_REPARACAO' ? 'text-blue-500' : 'text-green-500'}`}
+                      >
+                        <option value="ORCAMENTADO">🟠 ORÇAMENTADO</option>
+                        <option value="EM_REPARACAO">🔵 EM REPARAÇÃO</option>
+                        <option value="CONCLUIDO">🟢 CONCLUÍDO</option>
+                      </select>
+                      <Clock size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 pointer-events-none" />
+                    </div>
+                  )}
                 </div>
                 
-                {/* BOTÃO DE IMPRIMIR (CORRIGIDO: Passa o 's' do map) */}
                 <button 
                   onClick={() => handlePrint(s)}
                   className="p-3 bg-white/5 border border-white/10 text-slate-400 hover:bg-white hover:text-black transition-all rounded-sm shadow-lg"
@@ -209,7 +286,7 @@ export default function AdminAgendamentos() {
         {!loading && services.length === 0 && (
           <div className="text-center py-24 border border-dashed border-white/5 rounded-sm">
              <AlertCircle size={40} className="mx-auto text-slate-800 mb-4" />
-             <p className="text-slate-600 uppercase font-black text-xs italic tracking-widest">Sem agendamentos.</p>
+             <p className="text-slate-600 uppercase font-black text-xs italic tracking-widest">Nenhum veículo em lista de espera.</p>
           </div>
         )}
       </div>

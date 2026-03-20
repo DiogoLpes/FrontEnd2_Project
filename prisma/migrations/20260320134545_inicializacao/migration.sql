@@ -8,7 +8,6 @@ CREATE TABLE "Booking" (
     "date" TEXT NOT NULL,
     "hour" TEXT NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'PENDENTE',
-    "description" TEXT DEFAULT 'Aguardando receção da viatura',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

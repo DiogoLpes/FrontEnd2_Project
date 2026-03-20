@@ -1,20 +1,17 @@
-# Variáveis
-DB_URL=postgresql://admin:password123@localhost:5432/tspneus?schema=public
-SCHEMA_PATH=hello-prisma/prisma/schema.prisma
+# Variáveis corrigidas
+DB_URL=postgresql://postgres:admin123@localhost:5432/tspneus?schema=public
+SCHEMA_PATH=prisma/schema.prisma
 
-# Abre o Prisma Studio (Apontando para o ficheiro correto)
 studio:
-	bun prisma studio --schema=$(SCHEMA_PATH)
+	bun prisma studio
 
-# Faz as migrações
 setup:
 	docker compose up -d
 	@echo "A dar tempo ao Postgres para tomar café (10s)..."
 	@sleep 10
-	DATABASE_URL="postgresql://admin:password123@127.0.0.1:5432/tspneus?schema=public" bunx prisma migrate dev --name inicializacao
-	DATABASE_URL="postgresql://admin:password123@127.0.0.1:5432/tspneus?schema=public" bunx prisma studio --port 5555 --browser none
+	DATABASE_URL="$(DB_URL)" bunx prisma migrate dev --name inicializacao
+	DATABASE_URL="$(DB_URL)" bunx prisma studio --port 5555 --browser none
 
-# Gera o Prisma Client
 gen:
 	bunx prisma generate
 
