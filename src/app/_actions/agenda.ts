@@ -1,15 +1,15 @@
 "use server";
 
 import prisma from "../lib/prisma";
-import { ServiceType } from "@prisma/client"; // Importante para o TS
+import { ServiceType, ServiceStatus } from "@prisma/client"; 
 import { revalidatePath } from "next/cache";
 
 export async function createBookingAction(data: {
   plate: string;
   type: string;
   description?: string;
-  date: string; // Formato "YYYY-MM-DD"
-  time: string; // Formato "HH:mm"
+  date?: string; 
+  time?: string;
 }) {
   // 1. Encontrar o carro
   const vehicle = await prisma.vehicle.findUnique({
@@ -18,16 +18,23 @@ export async function createBookingAction(data: {
 
   if (!vehicle) throw new Error("Viatura não encontrada.");
 
-  // 2. Criar o serviço
+  // 2. Criar o serviço com o Status correto do teu Schema
   await prisma.service.create({
     data: {
-      type: data.type as ServiceType, // Cast para o Enum do Prisma
-      description: data.description,
-      date: new Date(`${data.date}T${data.time}:00`),
+      type: data.type as ServiceType,
+      description: data.description || "Sem descrição adicional",
+      // Se não houver data, usamos a atual como placeholder
+      date: data.date && data.time 
+        ? new Date(`${data.date}T${data.time}:00`) 
+        : new Date(), 
       vehicleId: vehicle.id,
-      status: "PENDENTE" // Valor default do teu Enum ServiceStatus
+      // MUDANÇA AQUI: Usar SOLICITADO em vez de PENDENTE
+      status: ServiceStatus.SOLICITADO 
     }
   });
 
   revalidatePath("/dashboard");
+  revalidatePath("/status");
+  
+  return { success: true };
 }

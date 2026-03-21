@@ -46,8 +46,7 @@ model Vehicle {
   fuel   String
   userId Int
   user   User   @relation(fields: [userId], references: [id])
-
-  // --- ADICIONADO PARA RESOLVER O ERRO ---
+  createdAt DateTime  @default(now())
   services Service[]
 }
 

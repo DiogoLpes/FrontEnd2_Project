@@ -1,45 +1,50 @@
 "use server";
 
-import { prisma } from "../lib/prisma"; 
+import prisma from "../lib/prisma";
+import { ServiceType, ServiceStatus } from "@prisma/client"; 
 import { revalidatePath } from "next/cache";
 
-export async function createBooking(data: {
-  plate: string;
-  service: string;
-  subService?: string;
-  medidaPneu?: string; // <--- ADICIONADO: Agora o TS já não reclama no Frontend
-  extraInfo?: string;
-  date: string;
-  hour: string;
-}) {
+export async function createBooking(data: any) {
   try {
-    // 1. Criamos a reserva
-    // Nota: Se o teu Model no Prisma ainda não tiver o campo 'medidaPneu', 
-    // vamos concatená-lo na extraInfo para não quebrar a Base de Dados
-    
-    const finalExtraInfo = data.medidaPneu 
-      ? `[MEDIDA: ${data.medidaPneu}] ${data.extraInfo || ""}`
-      : data.extraInfo;
-
-    const newBooking = await prisma.booking.create({
-      data: {
-        plate: data.plate,
-        service: data.service,
-        subService: data.subService,
-        extraInfo: finalExtraInfo, // Guardamos a medida aqui dentro
-        date: data.date,
-        hour: data.hour,
-        status: "PENDENTE",
-      },
+    // 1. Encontrar o carro
+    const vehicle = await prisma.vehicle.findUnique({
+      where: { plate: data.plate.toUpperCase() }
     });
 
-    // 2. Limpa a cache das páginas
-    revalidatePath("/status");
-    revalidatePath("/admin");
+    if (!vehicle) throw new Error("Viatura não encontrada.");
 
-    return { success: true, bookingId: newBooking.id };
-  } catch (error) {
-    console.error("Erro ao criar reserva:", error);
-    return { success: false, error: "Falha ao gravar no sistema." };
+    // DEBUG: Se der erro outra vez, vais ver no terminal o que está a chegar
+    console.log("Dados recebidos no Action:", data);
+
+    // 2. Garantir que o 'type' não é undefined
+    // Tentamos buscar de 'service' ou de 'type' (o que vier do frontend)
+    const serviceType = (data.service || data.type) as ServiceType;
+
+    if (!serviceType) {
+      throw new Error("O tipo de serviço é obrigatório.");
+    }
+
+    // 3. Montar a descrição
+    const descricaoFinal = `[${data.subService || "Geral"}] ${data.medidaPneu ? `Medida: ${data.medidaPneu}` : ""} - ${data.extraInfo || ""}`;
+
+    // 4. Criar no Prisma
+    await prisma.service.create({
+      data: {
+        type: serviceType,
+        description: descricaoFinal,
+        date: new Date(), // Data placeholder
+        vehicleId: vehicle.id,
+        status: ServiceStatus.SOLICITADO 
+      }
+    });
+
+    revalidatePath("/Tracking");
+    revalidatePath("/admin");
+    
+    return { success: true };
+
+  } catch (error: any) {
+    console.error("ERRO NO SERVER ACTION:", error.message);
+    throw error;
   }
 }

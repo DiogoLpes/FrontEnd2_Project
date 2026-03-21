@@ -2,113 +2,122 @@
 
 import React, { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Calendar, Clock, ChevronRight, ChevronDown, CheckCircle2, Droplets, Wrench } from "lucide-react";
+import { ChevronRight, ChevronDown, CheckCircle2 } from "lucide-react";
 import Swal from "sweetalert2";
+// Importamos a função com o nome que tens no teu arquivo de Actions
 import { createBooking } from "../../app/_actions/booking"; 
 
 export default function AgendaClient({ userVehicles = [] }: { userVehicles: any[] }) {
   const searchParams = useSearchParams();
   const plateFromUrl = searchParams.get("plate") || "";
 
-  // Estados do Formulário
   const [selectedPlate, setSelectedPlate] = useState(plateFromUrl);
   const [servico, setServico] = useState("");
   const [subOpcao, setSubOpcao] = useState("");
   const [medidaPneu, setMedidaPneu] = useState("");
   const [extraInfo, setExtraInfo] = useState("");
-  const [data, setData] = useState("");
-  const [hora, setHora] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const getCarDisplayName = () => {
-    const car = (userVehicles || []).find(v => v.plate === selectedPlate);
-    return car ? `${car.brand} ${car.model}` : "Selecione a Viatura";
+  // Formatação visual da matrícula no seletor
+  const formatPlate = (plate: string) => {
+    const clean = plate.toUpperCase().replace(/[^A-Z0-9]/g, "");
+    return clean.match(/.{1,2}/g)?.join("-") || clean;
   };
 
   const handleFinalSubmit = async () => {
-    if (!selectedPlate || !servico || !data || !hora) {
-      return Swal.fire("Atenção", "Preencha a viatura, serviço e horário.", "warning");
+    // Agora não validamos data/hora, apenas veículo e serviço
+    if (!selectedPlate || !servico) {
+      return Swal.fire({ 
+        title: "Dados Incompletos", 
+        text: "Por favor selecione a viatura e o serviço pretendido.", 
+        icon: "warning", 
+        background: "#0d0f14", 
+        color: "#fff" 
+      });
     }
 
     setIsSubmitting(true);
-    
-    Swal.fire({
-      title: "A REGISTAR...",
-      text: "A preparar a sua ordem de serviço",
-      allowOutsideClick: false,
-      didOpen: () => { Swal.showLoading(); }
-    });
+    Swal.fire({ title: "A ENVIAR PEDIDO...", allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+
+    // Preparamos a descrição que vai para o campo 'description' do Prisma
+    const descricaoTecnica = medidaPneu 
+      ? `[MEDIDA: ${medidaPneu}] ${subOpcao} - ${extraInfo}` 
+      : `${subOpcao} - ${extraInfo}`;
 
     try {
       const result = await createBooking({
         plate: selectedPlate,
-        service: servico,
-        subService: subOpcao,
-        medidaPneu: medidaPneu,
-        extraInfo: extraInfo,
-        date: data,
-        hour: hora
+        type: servico, // Envia o ID do serviço (PNEUS, OLEO, etc)
+        description: descricaoTecnica,
       });
 
-      if (result.success) {
-        const msg = `*TS PNEUS - NOVA RESERVA*%0A%0A🚗 *Viatura:* ${selectedPlate}%0A🛠️ *Serviço:* ${servico}${subOpcao ? ` (${subOpcao})` : ""}${medidaPneu ? `%0A📏 *Medida:* ${medidaPneu}` : ""}${extraInfo ? `%0A📝 *Obs:* ${extraInfo}` : ""}%0A📅 *Data:* ${data}%0A⏰ *Hora:* ${hora}`;
+      if (result) {
+        const msg = `*TS PNEUS - NOVO PEDIDO*%0A🚗 *Viatura:* ${selectedPlate}%0A🛠️ *Serviço:* ${servico}%0A📝 *Obs:* ${descricaoTecnica}`;
         
-        await Swal.fire({
-          title: "RESERVA REGISTADA!",
-          text: "Redirecionando para o WhatsApp para validação.",
-          icon: "success",
-          confirmButtonColor: "#2563eb"
+        await Swal.fire({ 
+          title: "PEDIDO ENVIADO!", 
+          text: "O técnico irá analisar e propor uma data e orçamento em breve.",
+          icon: "success", 
+          confirmButtonColor: "#2563eb",
+          background: "#0d0f14",
+          color: "#fff"
         });
 
         window.open(`https://wa.me/351912345678?text=${msg}`, "_blank");
-        window.location.href = "/status";
-      } else {
-        throw new Error();
+        window.location.href = "/tracking?plate=" + selectedPlate; 
       }
-    } catch (error) {
-      Swal.fire("Erro", "Falha ao gravar reserva. Tente novamente.", "error");
+    } catch (error: any) {
+      Swal.fire({
+        title: "Erro no Servidor",
+        text: error.message || "Não foi possível registar o pedido.",
+        icon: "error",
+        background: "#0d0f14",
+        color: "#fff"
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#05070a] pt-32 pb-20 px-4 font-sans text-white relative">
-      
-      <div className="max-w-5xl mx-auto relative z-10">
-        <div className="text-center mb-12">
-          <h1 className="text-6xl md:text-8xl font-black italic uppercase tracking-tighter leading-none">
+    <div className="min-h-screen bg-[#05070a] pt-24 pb-20 px-4 text-white">
+      <div className="max-w-4xl mx-auto">
+        
+        <div className="text-center mb-10">
+          <h1 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-none">
             WORK <span className="text-blue-600">ORDER</span>
           </h1>
-          <p className="text-slate-400 font-bold mt-4 uppercase tracking-widest text-[10px] italic">
-            {selectedPlate ? `Unidade: ${getCarDisplayName()}` : "Selecione a sua unidade de performance"}
-          </p>
+          <div className="flex items-center justify-center gap-2 mt-4">
+             <div className="h-px w-8 bg-blue-600"></div>
+             <p className="text-slate-500 font-black uppercase tracking-[0.3em] text-[9px]">Check-in Performance</p>
+             <div className="h-px w-8 bg-blue-600"></div>
+          </div>
         </div>
 
-        <div className="bg-[#0d0f14]/60 backdrop-blur-xl border border-white/10 rounded-[3rem] overflow-hidden shadow-2xl">
+        <div className="bg-[#0a0c10] border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl">
           
-          {/* 01. VIATURA (Com correção para o erro .map) */}
-          <div className="p-8 border-b border-white/5 bg-blue-600/5">
-            <label className="text-blue-500 font-black uppercase text-[10px] tracking-[0.3em] block mb-4">01. IDENTIFICAÇÃO DA UNIDADE</label>
+          <div className="p-8 border-b border-white/5 bg-gradient-to-b from-blue-600/[0.03] to-transparent">
+            <label className="text-blue-500 font-black uppercase text-[9px] tracking-[0.3em] block mb-4">01. Unidade de Intervenção</label>
             <div className="relative">
               <select 
                 value={selectedPlate}
                 onChange={(e) => setSelectedPlate(e.target.value)}
-                className="w-full bg-[#14171c] border border-white/10 p-5 rounded-2xl text-white font-bold uppercase outline-none focus:border-blue-600 appearance-none cursor-pointer"
+                className="w-full bg-[#14171c] border border-white/5 p-4 rounded-xl text-white font-bold uppercase outline-none focus:border-blue-600 appearance-none cursor-pointer text-sm"
               >
-                <option value="" disabled>Escolha o veículo...</option>
-                {(userVehicles || []).map((v) => (
-                  <option key={v.id} value={v.plate} className="bg-[#0d0f14]">{v.brand} {v.model} — [{v.plate}]</option>
+                <option value="" disabled>Selecionar Viatura da Garagem...</option>
+                {userVehicles.map((v: any) => (
+                  <option key={v.id} value={v.plate} className="bg-[#0d0f14]">
+                    {v.brand} {v.model} — [{formatPlate(v.plate)}]
+                  </option>
                 ))}
               </select>
-              <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-blue-600"><ChevronDown size={24} /></div>
+              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-blue-600 pointer-events-none" size={18} />
             </div>
           </div>
 
-          {/* 02. SERVIÇOS (CARDS MAIORES) */}
-          <div className="p-8 border-b border-white/5">
-            <label className="text-blue-500 font-black uppercase text-[10px] tracking-[0.3em] block mb-6">02. ESPECIFICAÇÃO DO SERVIÇO</label>
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="p-8">
+            <label className="text-blue-500 font-black uppercase text-[9px] tracking-[0.3em] block mb-6">02. Especificação Técnica</label>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {[
                 { id: 'PNEUS', label: 'Pneus / Alinhamento', img: '/assets/pneus.jpg' },
                 { id: 'OLEO', label: 'Mudança de Óleo', img: '/assets/oleo.png' },
@@ -120,85 +129,53 @@ export default function AgendaClient({ userVehicles = [] }: { userVehicles: any[
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => { setServico(item.id); setSubOpcao(""); setMedidaPneu(""); }}
-                  className={`relative h-40 rounded-3xl overflow-hidden border-2 transition-all group ${servico === item.id ? 'border-blue-600 scale-[1.02] shadow-[0_0_30px_rgba(37,99,235,0.2)]' : 'border-white/5 opacity-50 grayscale hover:opacity-100 hover:grayscale-0'}`}
+                  onClick={() => { setServico(item.id); setSubOpcao(""); }}
+                  className={`relative h-28 rounded-2xl overflow-hidden border transition-all duration-300 ${servico === item.id ? 'border-blue-600 scale-[1.02] shadow-lg' : 'border-white/5 opacity-40 grayscale hover:opacity-100 hover:grayscale-0'}`}
                 >
-                  <img src={item.img} className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-110" alt="" />
-                  <div className={`absolute inset-0 ${servico === item.id ? 'bg-blue-900/70' : 'bg-black/70'}`} />
-                  <span className="relative z-10 font-black uppercase italic text-xs px-4 text-center">{item.label}</span>
-                  {servico === item.id && <CheckCircle2 className="absolute top-4 right-4 text-blue-400" size={20} />}
+                  <img src={item.img} className="absolute inset-0 w-full h-full object-cover" alt="" />
+                  <div className={`absolute inset-0 ${servico === item.id ? 'bg-blue-600/60' : 'bg-black/60'}`} />
+                  <span className="relative z-10 font-black uppercase italic text-[10px] px-2">{item.label}</span>
+                  {servico === item.id && <CheckCircle2 className="absolute top-2 right-2 text-white" size={16} />}
                 </button>
               ))}
             </div>
 
-            {/* DETALHES DINÂMICOS */}
             {servico && (
-              <div className="mt-8 p-8 bg-black/40 rounded-[2rem] border border-white/5 animate-in fade-in slide-in-from-top-4">
-                
-                {/* Se for ÓLEO: Escolha Viscosidade */}
+              <div className="mt-6 p-6 bg-black/40 rounded-2xl border border-white/5 animate-in fade-in zoom-in-95">
                 {servico === 'OLEO' && (
-                  <div className="space-y-4">
-                    <p className="text-[10px] font-black uppercase text-blue-400 flex items-center gap-2"><Droplets size={14}/> Viscosidade do Óleo</p>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {['0W20', '5W30', '5W40', '10W40', '15W40'].map(v => (
-                        <button key={v} onClick={() => setSubOpcao(v)} className={`p-4 rounded-xl text-[10px] font-bold border transition-all ${subOpcao === v ? 'bg-blue-600 border-blue-600' : 'border-white/10 text-slate-500'}`}>{v}</button>
-                      ))}
-                    </div>
+                  <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
+                    {['0W20', '5W30', '5W40', '10W40', '15W40'].map(v => (
+                      <button key={v} type="button" onClick={() => setSubOpcao(v)} className={`py-3 rounded-lg text-[10px] font-black border transition-all ${subOpcao === v ? 'bg-blue-600 border-blue-600 text-white' : 'border-white/10 text-slate-500'}`}>{v}</button>
+                    ))}
                   </div>
                 )}
-
-                {/* Se for PNEUS: Escolha Gama e Medida */}
                 {servico === 'PNEUS' && (
-                  <div className="space-y-6">
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                       {['Económica', 'Premium', 'Performance', 'Alinhamento'].map(p => (
-                        <button key={p} onClick={() => setSubOpcao(p)} className={`p-4 rounded-xl text-[10px] font-bold uppercase border transition-all ${subOpcao === p ? 'bg-blue-600 border-blue-600' : 'border-white/10 text-slate-500'}`}>{p}</button>
+                        <button key={p} type="button" onClick={() => setSubOpcao(p)} className={`py-3 rounded-lg text-[10px] font-black uppercase border transition-all ${subOpcao === p ? 'bg-blue-600 border-blue-600 text-white' : 'border-white/10 text-slate-500'}`}>{p}</button>
                       ))}
                     </div>
-                    <input 
-                      type="text" 
-                      placeholder="MEDIDA (EX: 225/45 R17)" 
-                      className="w-full bg-[#14171c] border border-white/10 p-5 rounded-xl text-xs font-bold uppercase outline-none focus:border-blue-600"
-                      onChange={(e) => setMedidaPneu(e.target.value)}
-                    />
+                    <input type="text" placeholder="MEDIDA EX: 225/45 R17" className="w-full bg-[#14171c] border border-white/5 p-4 rounded-xl text-[11px] font-black uppercase outline-none focus:border-blue-600" onChange={(e) => setMedidaPneu(e.target.value)} />
                   </div>
                 )}
-
-                {/* Outros Serviços / Notas */}
-                {(servico === 'REVISAO' || servico === 'TRAVOES' || servico === 'ELETRONICA' || servico === 'OUTRO') && (
-                  <textarea 
-                    placeholder="DESCREVA O QUE PRECISA OU O SINTOMA DA VIATURA..." 
-                    className="w-full bg-[#14171c] border border-white/10 rounded-2xl p-6 text-xs font-bold uppercase outline-none focus:border-blue-600 min-h-[120px]"
-                    onChange={(e) => setExtraInfo(e.target.value)}
-                  />
-                )}
+                <textarea 
+                  placeholder="NOTAS TÉCNICAS OU SINTOMAS..." 
+                  className="w-full bg-[#14171c] border border-white/5 rounded-xl p-4 text-[11px] font-black uppercase outline-none focus:border-blue-600 min-h-[80px] mt-4" 
+                  onChange={(e) => setExtraInfo(e.target.value)} 
+                />
               </div>
             )}
           </div>
 
-          {/* 03. DATA E HORA */}
-          <div className="p-8 bg-black/20 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-center gap-4 bg-[#14171c] p-5 rounded-2xl border border-white/10 focus-within:border-blue-600">
-              <Calendar className="text-blue-600" />
-              <input type="date" value={data} onChange={(e) => setData(e.target.value)} className="bg-transparent text-white font-bold uppercase outline-none w-full text-sm" />
-            </div>
-            <div className="flex items-center gap-4 bg-[#14171c] p-5 rounded-2xl border border-white/10 focus-within:border-blue-600">
-              <Clock className="text-blue-600" />
-              <input type="time" value={hora} onChange={(e) => setHora(e.target.value)} className="bg-transparent text-white font-bold uppercase outline-none w-full text-sm" />
-            </div>
-          </div>
-
-          {/* SUBMIT BUTTON (Equilibrado) */}
-          <div className="p-10 text-center">
+          <div className="p-8 bg-[#0d0f14]">
             <button 
               onClick={handleFinalSubmit}
               disabled={isSubmitting}
-              className="group relative w-full md:w-2/3 mx-auto bg-blue-600 hover:bg-white text-white hover:text-black py-6 rounded-2xl font-black uppercase italic text-xl transition-all shadow-2xl flex items-center justify-center gap-4 overflow-hidden disabled:opacity-50"
+              className="w-full bg-blue-600 hover:bg-white text-white hover:text-black py-5 rounded-2xl font-black uppercase italic text-sm transition-all shadow-xl flex items-center justify-center gap-3 disabled:opacity-50 group"
             >
-              <span className="relative z-10 flex items-center gap-3">
-                {isSubmitting ? "A PROCESSAR..." : "CONFIRMAR AGENDAMENTO"} <ChevronRight className="group-hover:translate-x-2 transition-transform" />
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+              {isSubmitting ? "A PROCESSAR..." : "FINALIZAR ORDEM DE SERVIÇO"} 
+              <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
         </div>
