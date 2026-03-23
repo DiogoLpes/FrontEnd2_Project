@@ -1,3 +1,7 @@
+// 1. FORÇA RENDERIZAÇÃO DINÂMICA (Essencial para o build no Vercel passar)
+export const dynamic = "force-dynamic";
+
+import React from "react";
 import prisma from "@/app/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
@@ -10,7 +14,8 @@ export default async function ClientesAdminPage() {
   if (!session?.user?.email) redirect("/auth/login");
 
   // Busca utilizadores e inclui a contagem de veículos e serviços
-  const clientes = await prisma.user.findMany({
+  // Tipamos como any[] para evitar conflitos com o seu Prisma customizado no build
+  const clientes: any[] = await prisma.user.findMany({
     include: {
       vehicles: {
         include: {
@@ -57,7 +62,8 @@ export default async function ClientesAdminPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
-            {clientes.map((cliente) => (
+            {/* CORREÇÃO: Adicionado (cliente: any) para o TypeScript aceitar o map */}
+            {clientes.map((cliente: any) => (
               <tr key={cliente.id} className="hover:bg-white/[0.01] transition-colors group">
                 <td className="p-4">
                   <div className="flex items-center gap-3">
@@ -79,11 +85,12 @@ export default async function ClientesAdminPage() {
                 <td className="p-4 text-center">
                   <span className="inline-flex items-center gap-1.5 bg-white/5 px-2.5 py-1 rounded-md text-xs font-bold text-slate-300 border border-white/5">
                     <Car size={12} />
-                    {cliente.vehicles.length}
+                    {cliente.vehicles?.length || 0}
                   </span>
                 </td>
                 <td className="p-4 text-center text-sm font-bold text-blue-500">
-                  {cliente.vehicles.reduce((acc, v) => acc + v.services.length, 0)}
+                  {/* CORREÇÃO: Tipagem do reduce para evitar erros de acumulação */}
+                  {cliente.vehicles?.reduce((acc: number, v: any) => acc + (v.services?.length || 0), 0) || 0}
                 </td>
                 <td className="p-4 text-right">
                   <button className="text-slate-500 hover:text-white p-2">
