@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output = "../src/generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -38,17 +38,17 @@ model Booking {
 // VEÍCULOS
 // ==========================================
 model Vehicle {
-  id     Int    @id @default(autoincrement())
-  plate  String @unique
-  brand  String
-  model  String
-  color  String
-  year   Int
-  fuel   String
-  userId Int
-  user   User   @relation(fields: [userId], references: [id])
+  id        Int       @id @default(autoincrement())
+  plate     String    @unique
+  brand     String
+  model     String
+  color     String
+  year      Int
+  fuel      String
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id])
   createdAt DateTime  @default(now())
-  services Service[]
+  services  Service[]
 }
 
 // ==========================================
@@ -110,8 +110,8 @@ enum ServiceType {
 
 enum ServiceStatus {
   PENDENTE
-  ORCAMENTADO 
-  EM_REPARACAO 
-  CONCLUIDO 
-  CANCELADO 
+  ORCAMENTADO
+  EM_REPARACAO
+  CONCLUIDO
+  CANCELADO
 }

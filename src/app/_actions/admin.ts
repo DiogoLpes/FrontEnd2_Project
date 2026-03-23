@@ -2,7 +2,8 @@
 
 import prisma from "@/app/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { ServiceStatus } from "@prisma/client";
+// import { ServiceStatus } from "@prisma/client";
+import { ServiceStatus } from "@/generated/prisma/client"; // Ajusta o caminho conforme a tua estrutura
 
 export async function updateServiceStatusAction(id: string, status: string) {
   try {
