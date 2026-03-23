@@ -12,8 +12,8 @@ export default async function AdminDashboard() {
     orderBy: { createdAt: 'desc' }
   });
   
-  // No teu schema o status inicial é SOLICITADO, não PENDENTE
-  const pendentes = servicos.filter(s => s.status === "SOLICITADO").length;
+  // No teu schema o status inicial é PENDENTE, não SOLICITADO
+  const pendentes = servicos.filter(s => s.status === "PENDENTE").length;
   const concluidos = servicos.filter(s => s.status === "CONCLUIDO").length;
   const emReparacao = servicos.filter(s => s.status === "EM_REPARACAO").length;
 
@@ -80,7 +80,7 @@ export default async function AdminDashboard() {
                   <p className="text-[10px] text-slate-500 uppercase">{s.type}</p>
                 </div>
                 <div className={`text-[9px] font-black px-2 py-1 rounded ${
-                  s.status === 'SOLICITADO' ? 'bg-amber-500/10 text-amber-500' : 'bg-blue-500/10 text-blue-500'
+                  s.status === 'PENDENTE' ? 'bg-amber-500/10 text-amber-500' : 'bg-blue-500/10 text-blue-500'
                 }`}>
                   {s.status}
                 </div>

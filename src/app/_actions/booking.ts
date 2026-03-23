@@ -34,7 +34,7 @@ export async function createBooking(data: any) {
         description: descricaoFinal,
         date: new Date(), // Data placeholder
         vehicleId: vehicle.id,
-        status: ServiceStatus.SOLICITADO 
+        status: ServiceStatus.PENDENTE 
       }
     });
 

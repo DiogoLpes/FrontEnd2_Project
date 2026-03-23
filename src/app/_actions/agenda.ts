@@ -29,7 +29,7 @@ export async function createBookingAction(data: {
         : new Date(), 
       vehicleId: vehicle.id,
       // MUDANÇA AQUI: Usar SOLICITADO em vez de PENDENTE
-      status: ServiceStatus.SOLICITADO 
+      status: ServiceStatus.PENDENTE
     }
   });
 
