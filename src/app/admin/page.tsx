@@ -1,4 +1,5 @@
-// src/app/admin/dashboard/page.tsx
+export const dynamic = "force-dynamic";
+
 import React from "react";
 import prisma from "@/app/lib/prisma";
 import { Wrench, Users, AlertCircle, CheckCircle, TrendingUp, Clock } from "lucide-react";
