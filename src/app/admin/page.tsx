@@ -13,10 +13,9 @@ export default async function AdminDashboard() {
   });
   
   // No teu schema o status inicial é PENDENTE, não SOLICITADO
-  const pendentes = servicos.filter(s => s.status === "PENDENTE").length;
-  const concluidos = servicos.filter(s => s.status === "CONCLUIDO").length;
-  const emReparacao = servicos.filter(s => s.status === "EM_REPARACAO").length;
-
+  const pendentes = servicos.filter((s: any) => s.status === "PENDENTE").length;
+  const concluidos = servicos.filter((s: any) => s.status === "CONCLUIDO").length;
+  const emReparacao = servicos.filter((s: any) => s.status === "EM_REPARACAO").length;
   return (
     <div className="p-6 space-y-8 bg-[#05070a] min-h-screen text-white">
       {/* HEADER DINÂMICO */}
@@ -73,7 +72,7 @@ export default async function AdminDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {servicos.slice(0, 5).map((s) => (
+            {servicos.slice(0, 5).map((s: any) => (
               <div key={s.id} className="flex items-center justify-between group">
                 <div>
                   <p className="text-xs font-bold text-white uppercase">{s.vehicle?.plate}</p>

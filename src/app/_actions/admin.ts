@@ -3,7 +3,7 @@
 import prisma from "@/app/lib/prisma";
 import { revalidatePath } from "next/cache";
 // import { ServiceStatus } from "@prisma/client";
-import { ServiceStatus } from "../../generated/prisma";
+import { ServiceStatus } from "@/generated/prisma";
 
 export async function updateServiceStatusAction(id: string, status: string) {
   try {

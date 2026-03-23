@@ -6,21 +6,38 @@ import {
   Car, 
   User, 
   Clock, 
-  CheckCircle2, 
   AlertCircle,
   Wrench,
   Search,
-  Filter,
   Printer,
   Euro
 } from "lucide-react";
 import Swal from "sweetalert2";
 
+// 1. DEFINIÇÃO DE TIPOS (Para o TypeScript não reclamar)
+interface ServiceEntry {
+  id: number;
+  type: string;
+  description: string | null;
+  status: string;
+  price: number | null;
+  date: string | null;
+  vehicle: {
+    plate: string;
+    brand: string;
+    model: string;
+    owner?: {
+      name: string;
+      phone: string;
+    }
+  }
+}
+
 export default function AdminAgendamentos() {
-  const [services, setServices] = useState([]);
+  // Tipamos o estado como uma array de ServiceEntry
+  const [services, setServices] = useState<ServiceEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. BUSCA DE DADOS
   const fetchServices = async () => {
     try {
       setLoading(true);
@@ -36,7 +53,6 @@ export default function AdminAgendamentos() {
 
   useEffect(() => { fetchServices(); }, []);
 
-  // 2. FUNÇÃO: DAR ORÇAMENTO (MODAL)
   const handleDarOrcamento = async (serviceId: number) => {
     const { value: formValues } = await Swal.fire({
       title: '<span class="text-white font-black italic uppercase tracking-tighter">Enviar Orçamento</span>',
@@ -76,7 +92,7 @@ export default function AdminAgendamentos() {
           body: JSON.stringify({ 
             id: serviceId, 
             status: "ORCAMENTADO", 
-            price: formValues.price, 
+            price: parseFloat(formValues.price), 
             date: formValues.date 
           }),
           headers: { "Content-Type": "application/json" },
@@ -99,7 +115,6 @@ export default function AdminAgendamentos() {
     }
   };
 
-  // 3. ATUALIZAÇÃO DE STATUS SIMPLES
   const updateStatus = async (id: number, newStatus: string) => {
     try {
       const res = await fetch("/api/services", {
@@ -125,8 +140,8 @@ export default function AdminAgendamentos() {
     }
   };
 
-  // 4. IMPRESSÃO DE GUIA
-  const handlePrint = (s: any) => {
+  // Tipamos o parâmetro 's' como ServiceEntry
+  const handlePrint = (s: ServiceEntry) => {
     const printContent = `
       <div style="font-family: sans-serif; padding: 40px; color: #000;">
         <h1 style="text-transform: uppercase; font-style: italic; border-bottom: 2px solid #000; padding-bottom: 10px;">TS PNEUS - Guia de Oficina</h1>
@@ -168,13 +183,6 @@ export default function AdminAgendamentos() {
           </h1>
           <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">Painel Administrativo TS PNEUS</p>
         </div>
-        
-        <div className="flex gap-2">
-           <div className="bg-[#0d1117] border border-white/5 p-2 px-4 flex items-center gap-2 text-slate-400 text-xs">
-              <Search size={14} />
-              <input placeholder="Procurar matrícula..." className="bg-transparent outline-none uppercase font-bold w-32" />
-           </div>
-        </div>
       </div>
 
       {/* LISTAGEM */}
@@ -182,20 +190,18 @@ export default function AdminAgendamentos() {
         {loading ? (
           <div className="text-center p-20 text-blue-600 animate-pulse font-black uppercase italic">A sincronizar com a base de dados...</div>
         ) : (
-          services.map((s: any) => (
+          services.map((s: ServiceEntry) => (
             <div key={s.id} className="bg-[#0d1117] border border-white/5 p-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 hover:border-blue-600/30 transition-all group relative overflow-hidden">
               
-              {/* BARRA DE STATUS LATERAL */}
               <div className={`absolute left-0 top-0 h-full w-1 ${
-                s.status === 'SOLICITADO' ? 'bg-white/20' : 
+                s.status === 'PENDENTE' || s.status === 'SOLICITADO' ? 'bg-white/20' : 
                 s.status === 'ORCAMENTADO' ? 'bg-orange-500' : 
                 s.status === 'EM_REPARACAO' ? 'bg-blue-500' : 'bg-green-500'
               }`}></div>
 
-              {/* COLUNA 1: VEÍCULO E CLIENTE */}
               <div className="flex gap-5 flex-1 text-white">
                 <div className={`w-14 h-14 flex items-center justify-center border transition-colors ${
-                  s.status === 'SOLICITADO' ? 'bg-white/5 border-white/10 text-white' :
+                  s.status === 'PENDENTE' ? 'bg-white/5 border-white/10 text-white' :
                   s.status === 'ORCAMENTADO' ? 'bg-orange-500/5 border-orange-500/20 text-orange-500' : 
                   s.status === 'EM_REPARACAO' ? 'bg-blue-500/5 border-blue-500/20 text-blue-500' : 
                   'bg-green-500/5 border-green-500/20 text-green-500'
@@ -213,81 +219,51 @@ export default function AdminAgendamentos() {
                   </div>
                   <p className="text-slate-400 text-[10px] font-bold uppercase flex items-center gap-1.5">
                     <User size={12} className="text-slate-600" /> {s.vehicle?.owner?.name || "N/D"} 
-                    <span className="text-slate-700 mx-1">|</span> 
-                    <span className="text-slate-500">{s.vehicle?.owner?.phone || "S/ TEL"}</span>
-                  </p>
-                  <p className="text-slate-500 text-xs mt-2 italic line-clamp-1 border-l border-white/10 pl-3">
-                    "{s.description || "Sem notas do cliente"}"
                   </p>
                 </div>
               </div>
 
-              {/* COLUNA 2: VALOR E DATA */}
               <div className="flex flex-col lg:items-end min-w-[150px]">
                   <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-1">
                     <Wrench size={10} /> {s.type}
                   </span>
-                  
-                  {s.price ? (
+                  {s.price && (
                     <div className="flex items-center gap-1 text-green-500 font-black text-xl italic tracking-tighter mt-1">
-                       {s.price.toFixed(2)}€
+                       {Number(s.price).toFixed(2)}€
                     </div>
-                  ) : (
-                    <div className="text-slate-600 text-[10px] font-bold uppercase mt-1">Preço pendente</div>
                   )}
-
-                  <div className="flex items-center gap-2 text-slate-400 font-mono text-[10px] mt-1">
-                    <Calendar size={12} />
-                    {s.date ? new Date(s.date).toLocaleDateString() : 'A agendar'}
-                  </div>
               </div>
 
-              {/* COLUNA 3: AÇÕES DINÂMICAS */}
               <div className="flex items-center gap-3 w-full lg:w-80">
                 <div className="flex-1">
-                  {s.status === 'SOLICITADO' ? (
+                  {s.status === 'PENDENTE' || s.status === 'SOLICITADO' ? (
                     <button 
                       onClick={() => handleDarOrcamento(s.id)}
-                      className="w-full bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase p-3 transition-all flex items-center justify-center gap-2 group animate-pulse hover:animate-none"
+                      className="w-full bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase p-3 transition-all flex items-center justify-center gap-2"
                     >
-                      <Euro size={14} className="group-hover:rotate-12 transition-transform" /> 
-                      Dar Orçamento
+                      <Euro size={14} /> Dar Orçamento
                     </button>
                   ) : (
                     <div className="relative">
                       <select 
                         value={s.status}
                         onChange={(e) => updateStatus(s.id, e.target.value)}
-                        className={`w-full bg-black/40 border border-white/10 text-[10px] font-black uppercase p-3 pr-8 outline-none cursor-pointer appearance-none transition-all focus:border-blue-600
-                          ${s.status === 'ORCAMENTADO' ? 'text-orange-500' : s.status === 'EM_REPARACAO' ? 'text-blue-500' : 'text-green-500'}`}
+                        className="w-full bg-black/40 border border-white/10 text-[10px] font-black uppercase p-3 outline-none cursor-pointer appearance-none text-white"
                       >
-                        <option value="ORCAMENTADO">🟠 ORÇAMENTADO</option>
-                        <option value="EM_REPARACAO">🔵 EM REPARAÇÃO</option>
-                        <option value="CONCLUIDO">🟢 CONCLUÍDO</option>
+                        <option value="ORCAMENTADO">ORÇAMENTADO</option>
+                        <option value="EM_REPARACAO">EM REPARAÇÃO</option>
+                        <option value="CONCLUIDO">CONCLUÍDO</option>
                       </select>
-                      <Clock size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 pointer-events-none" />
                     </div>
                   )}
                 </div>
-                
-                <button 
-                  onClick={() => handlePrint(s)}
-                  className="p-3 bg-white/5 border border-white/10 text-slate-400 hover:bg-white hover:text-black transition-all rounded-sm shadow-lg"
-                  title="Imprimir Guia"
-                >
+                <button onClick={() => handlePrint(s)} className="p-3 bg-white/5 border border-white/10 text-slate-400 rounded-sm">
                   <Printer size={18} />
                 </button>
               </div>
 
             </div>
           ))
-        )}
-
-        {!loading && services.length === 0 && (
-          <div className="text-center py-24 border border-dashed border-white/5 rounded-sm">
-             <AlertCircle size={40} className="mx-auto text-slate-800 mb-4" />
-             <p className="text-slate-600 uppercase font-black text-xs italic tracking-widest">Nenhum veículo em lista de espera.</p>
-          </div>
         )}
       </div>
     </div>
