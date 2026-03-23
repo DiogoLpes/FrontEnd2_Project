@@ -103,7 +103,7 @@ enum ServiceType {
   PNEUS
   OLEO
   TRAVOES
-  DIAGNOSTICO
+  ELETRONICA
   OUTRO
 }
 

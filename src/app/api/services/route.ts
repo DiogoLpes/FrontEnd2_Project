@@ -1,22 +1,33 @@
 import { NextResponse } from "next/server";
-import prisma from "../../lib/prisma"; // Ajusta o caminho se necessário
+import { prisma } from "@/app/lib/prisma"; // Ajusta o @/ conforme o teu projeto
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    const { searchParams } = new URL(req.url);
+    const plate = searchParams.get("plate");
+
+
+    if (plate) {
+      const service = await prisma.service.findFirst({
+        where: { vehicle: { plate: plate.toUpperCase() } },
+        include: { vehicle: true },
+        orderBy: { createdAt: "desc" },
+      });
+      return NextResponse.json(service);
+    }
+
     const services = await prisma.service.findMany({
       include: {
         vehicle: {
-          include: {
-            owner: true, 
-          },
+          include: { user: true },
         },
       },
-      orderBy: { createdAt: "desc" }, // Ordenar pelos mais recentes
+      orderBy: { createdAt: "desc" },
     });
     return NextResponse.json(services);
-  } catch (error) {
-    console.error("GET Error:", error);
-    return NextResponse.json({ error: "Erro ao procurar agendamentos" }, { status: 500 });
+
+  } catch (error: any) {
+    return NextResponse.json([], { status: 500 });
   }
 }
 
@@ -25,14 +36,16 @@ export async function PATCH(req: Request) {
     const body = await req.json();
     const { id, status, price, date } = body;
 
-    // Construímos o objeto de atualização dinamicamente
     const updateData: any = { status };
     
-    // Se o Admin enviou preço, adicionamos ao update
-    if (price !== undefined) updateData.price = parseFloat(price);
+    // parseFloat garante que o preço é gravado como Float no Postgres
+    if (price !== undefined && price !== "") {
+      updateData.price = parseFloat(price);
+    }
     
-    // Se o Admin enviou data, convertemos para objeto Date do JS
-    if (date) updateData.date = new Date(date);
+    if (date) {
+      updateData.date = new Date(date);
+    }
 
     const updated = await prisma.service.update({
       where: { id: Number(id) },
@@ -42,6 +55,6 @@ export async function PATCH(req: Request) {
     return NextResponse.json(updated);
   } catch (error) {
     console.error("PATCH Error:", error);
-    return NextResponse.json({ error: "Erro ao atualizar agendamento" }, { status: 500 });
+    return NextResponse.json({ error: "Erro ao atualizar" }, { status: 500 });
   }
 }

@@ -33,8 +33,7 @@ export async function createBookingAction(data: {
     }
   });
 
-  revalidatePath("/dashboard");
-  revalidatePath("/status");
+  revalidatePath("/Tracking"); 
   
   return { success: true };
 }
