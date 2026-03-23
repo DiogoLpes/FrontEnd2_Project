@@ -30,4 +30,4 @@ export default async function DashboardPage() {
       userVehicles={vehicles} 
     />
   );
-}
+}   
