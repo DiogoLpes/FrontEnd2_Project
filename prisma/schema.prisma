@@ -59,7 +59,7 @@ model Service {
   description String?
   date        DateTime?
   price       Float?
-  status      ServiceStatus @default(SOLICITADO)
+  status      ServiceStatus @default(PENDENTE)
 
   // Relação com Veículo
   vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
@@ -108,9 +108,9 @@ enum ServiceType {
 }
 
 enum ServiceStatus {
-  SOLICITADO // Cliente enviou o pedido
-  ORCAMENTADO // Admin definiu preço e data
-  EM_REPARACAO // Carro em mãos
-  CONCLUIDO // Carro pronto
-  CANCELADO // Recusado
+  PENDENTE
+  ORCAMENTADO 
+  EM_REPARACAO 
+  CONCLUIDO 
+  CANCELADO 
 }
