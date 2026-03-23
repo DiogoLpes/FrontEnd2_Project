@@ -51,7 +51,7 @@ export default async function StatusPage({
   }
 
   // Formatar os dados para o Componente de Cliente
-  const formattedBookings = bookings.map(b => ({
+  const formattedBookings = bookings.map((b: any) => ({
     id: b.id,
     plate: b.vehicle.plate,
     brand: b.vehicle.brand,
