@@ -2,36 +2,40 @@
 
 import prisma from "@/app/lib/prisma";
 import { revalidatePath } from "next/cache";
-// import { ServiceStatus } from "@prisma/client";
 import { ServiceStatus } from "@/generated/prisma";
 
-export async function updateServiceStatusAction(id: string, status: string) {
+export async function updateServiceStatusAction(
+  id: string,
+  status: ServiceStatus
+) {
   try {
     await prisma.service.update({
-      where: { 
-        id: Number(id) // Converte string para número para o Prisma
+      where: {
+        id: Number(id),
       },
-      data: { 
-        status: status as ServiceStatus // Cast para o Enum do Prisma
+      data: {
+        status, // já vem tipado corretamente
       },
     });
-    
+
     revalidatePath("/admin");
   } catch (error) {
     console.error("Erro ao atualizar status:", error);
+    throw new Error("Falha ao atualizar status");
   }
 }
 
 export async function deleteServiceAction(id: string) {
   try {
     await prisma.service.delete({
-      where: { 
-        id: Number(id) 
+      where: {
+        id: Number(id),
       },
     });
-    
+
     revalidatePath("/admin");
   } catch (error) {
     console.error("Erro ao apagar serviço:", error);
+    throw new Error("Falha ao apagar serviço");
   }
 }
