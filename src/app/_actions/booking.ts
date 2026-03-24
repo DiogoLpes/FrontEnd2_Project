@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "../lib/prisma";
-import { ServiceType, ServiceStatus } from "@prisma/client"; 
+import { ServiceType, ServiceStatus } from "@/generated/prisma"; 
 import { revalidatePath } from "next/cache";
 
 export async function createBooking(data: any) {
