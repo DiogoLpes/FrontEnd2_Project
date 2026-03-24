@@ -35,7 +35,7 @@ export default async function Page() {
 
             <div className="flex flex-wrap gap-4">
               {/* O TEU COMPONENTE CLIENTE ENTRA AQUI */}
-              <HomeClient hasVehicles={hasCars} />
+              <HomeClient hasVehicles={hasCars} isLoggedIn={false} />
 
               <Link href="/Tracking" className="w-full md:w-auto">
                 <Button 

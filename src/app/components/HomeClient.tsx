@@ -1,31 +1,28 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Button } from "../components/ui/button"; // Ajusta o caminho se necessário
-import { ChevronRight } from "lucide-react";
+import { Button } from "./ui/button";
 
-interface HomeClientProps {
-  hasVehicles: boolean;
-}
-
-export default function HomeClient({ hasVehicles }: HomeClientProps) {
+export default function HomeClient({ hasVehicles, isLoggedIn }: { hasVehicles: boolean, isLoggedIn: boolean }) {
   const router = useRouter();
 
-  const handleBookingClick = () => {
-    if (hasVehicles) {
-      router.push('/agenda');
+  const handleAction = () => {
+    if (!isLoggedIn) {
+      router.push("/auth"); // Se não estiver logado
+    } else if (!hasVehicles) {
+      router.push("/dashboard/addcar"); // Se logado mas sem carro
     } else {
-      router.push('/dashboard/addcar');
+      router.push("/agenda"); // Se tiver tudo pronto
     }
   };
 
   return (
     <Button 
-      onClick={handleBookingClick}
+      onClick={handleAction}
       size="lg" 
-      className="h-20 px-10 bg-blue-600 hover:bg-white text-white hover:text-black font-black uppercase italic text-xl transition-all shadow-lg group w-full md:w-auto"
+      className="bg-blue-600 text-white font-black px-10 h-20 text-xl hover:bg-blue-700 w-full md:w-auto uppercase italic"
     >
-      MARCAR REVISÃO <ChevronRight className="ml-2 group-hover:translate-x-2 transition-transform" />
+      FAZER MARCAÇÃO
     </Button>
   );
 }

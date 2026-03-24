@@ -23,6 +23,7 @@ export async function createBookingAction(data: {
       type: data.type as ServiceType,
       description: data.description || "Sem descrição adicional",
       
+
       date: data.date && data.time 
         ? new Date(`${data.date}T${data.time}:00`) 
         : new Date(), 
