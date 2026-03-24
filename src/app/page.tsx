@@ -53,7 +53,7 @@ export default async function Page() {
                   size="lg" 
                   variant="outline" 
                   className="border-2 border-white font-black px-10 h-20 text-xl hover:bg-white hover:text-black w-full text-white uppercase italic"
-                >
+                > 
                   VER STATUS
                 </Button>
               </Link>
