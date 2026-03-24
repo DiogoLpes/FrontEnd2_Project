@@ -8,11 +8,11 @@ export default function HomeClient({ hasVehicles, isLoggedIn }: { hasVehicles: b
 
   const handleAction = () => {
     if (!isLoggedIn) {
-      router.push("/auth"); // Se não estiver logado
+      router.push("/auth"); 
     } else if (!hasVehicles) {
-      router.push("/dashboard/addcar"); // Se logado mas sem carro
+      router.push("/dashboard/addcar"); 
     } else {
-      router.push("/agenda"); // Se tiver tudo pronto
+      router.push("/agenda"); 
     }
   };
 

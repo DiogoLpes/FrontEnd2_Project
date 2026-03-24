@@ -1,14 +1,25 @@
-import { Wrench, Gauge, ShieldCheck, Settings, Zap } from "lucide-react";
+import { Settings } from "lucide-react";
 import { Button } from "./components/ui/button";
 import Location from "./components/ui/localizacao";
 import Link from "next/link";
-import { prisma } from "./lib/prisma";
+import prisma from "./lib/prisma"; // Confirma se é 'import prisma' ou '{ prisma }'
 import HomeClient from "./components/HomeClient"; 
+import { authOptions } from "./lib/auth";
+import { getServerSession } from "next-auth";
 
 export default async function Page() {
-  // 1. Lógica de Servidor: Verifica se há carros
-  const vehicles = await prisma.vehicle.findMany().catch(() => []);
-  const hasCars = vehicles.length > 0;
+  // 1. Busca a sessão do utilizador
+  const session = await getServerSession(authOptions);
+
+  // 2. Lógica de Servidor: Verifica se o utilizador LOGADO tem carros
+  let hasCars = false;
+  if (session?.user?.email) {
+    const userWithVehicles = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      include: { vehicles: true }
+    });
+    hasCars = (userWithVehicles?.vehicles?.length ?? 0) > 0;
+  }
 
   return (
     <div className="min-h-screen bg-[#05070a] text-white font-sans selection:bg-blue-600/30">
@@ -34,10 +45,10 @@ export default async function Page() {
             </p>
 
             <div className="flex flex-wrap gap-4">
-              {/* O TEU COMPONENTE CLIENTE ENTRA AQUI */}
-              <HomeClient hasVehicles={hasCars} isLoggedIn={false} />
+              {/* Agora passamos os dados reais para o botão */}
+              <HomeClient hasVehicles={hasCars} isLoggedIn={!!session} />
 
-              <Link href="/Tracking" className="w-full md:w-auto">
+              <Link href="/tracking" className="w-full md:w-auto">
                 <Button 
                   size="lg" 
                   variant="outline" 
