@@ -1,6 +1,6 @@
 import { prisma } from "../lib/prisma"; // Ajusta se o teu for ../lib/prisma
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"; // Ajusta o caminho do teu authOptions
+import { authOptions } from "../lib/auth"; // Ajusta o caminho do teu authOptions
 import { redirect } from "next/navigation";
 import DashboardClient from "./DashboardClient";
 

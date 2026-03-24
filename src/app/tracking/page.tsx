@@ -1,7 +1,7 @@
 import { prisma } from "../lib/prisma"; // ajusta o caminho conforme a tua estrutura
 import StatusClient from "./StatusClient";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
+import { authOptions } from "../lib/auth"; // ajusta o caminho conforme a tua estrutura
 import Link from "next/link";
 import { Car } from "lucide-react";
 
