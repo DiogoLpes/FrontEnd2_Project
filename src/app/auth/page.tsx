@@ -131,26 +131,27 @@ function AuthContent() {
 
   const onLogin = async () => {
     if (!validateForm()) return;
+
     setLoading(true);
 
-    const res = await signIn("credentials", { 
-      email: formData.email, 
-      password: formData.password, 
-      redirect: false 
+    const res = await signIn("credentials", {
+      email: formData.email,
+      password: formData.password,
+      redirect: false
     });
 
     if (res?.error) {
       toast("ERRO", "Acesso Negado. Verifique utilizador e password.", "error");
       setLoading(false);
-    } else {
-      toast("SUCESSO", "A entrar em TSPneus...", "success");
-      router.refresh();
-      const userMail = formData.email.toLowerCase();
-      const destination = (userMail === "admin" || userMail === "admin@local.com") ? "/admin" : "/";
-      setTimeout(() => {
-        router.push(destination);
-      }, 500);
+      return;
     }
+
+    toast("SUCESSO", "Login efetuado!", "success");
+
+ 
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 300);
   };
 
   const onRegister = async () => {
