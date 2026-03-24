@@ -64,7 +64,7 @@ export default function Navbar() {
         <div className="hidden lg:flex items-center gap-8">
           {[
             { name: "Início", path: "/" },
-            { name: "Rastreio", path: "/Tracking" },
+            { name: "Rastreio", path: "/tracking" },
             { name: "Agendar", path: "/agenda" }
           ].map((item) => (
             <button 
