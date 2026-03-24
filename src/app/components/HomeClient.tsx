@@ -20,7 +20,7 @@ export default function HomeClient({ hasVehicles, isLoggedIn }: HomeClientProps)
 
     // 2. Se está logado mas não tem carros, vai para AddCar
     if (!hasVehicles) {
-      router.push("/dashboard/addcar");
+      router.push("/dashboard");
       return;
     }
 
@@ -29,9 +29,9 @@ export default function HomeClient({ hasVehicles, isLoggedIn }: HomeClientProps)
   };
 
   return (
-    <Button 
+    <Button
       onClick={handleAction}
-      size="lg" 
+      size="lg"
       className="bg-blue-600 text-white font-black px-10 h-20 text-xl hover:bg-blue-700 w-full md:w-auto uppercase italic"
     >
       FAZER MARCAÇÃO
