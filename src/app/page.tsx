@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Settings } from "lucide-react";
 import { Button } from "./components/ui/button";
 import Location from "./components/ui/localizacao";

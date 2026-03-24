@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { prisma } from "../lib/prisma"; // ajusta o caminho conforme a tua estrutura
 import StatusClient from "./StatusClient";
 import { getServerSession } from "next-auth";
