@@ -46,7 +46,7 @@ export default async function Page() {
 
             <div className="flex flex-wrap gap-4">
               {/* Agora passamos os dados reais para o botão */}
-              <HomeClient hasVehicles={hasCars} isLoggedIn={!!session} />
+              <HomeClient hasVehicles={hasCars} isLoggedIn={session !== null} />
 
               <Link href="/tracking" className="w-full md:w-auto">
                 <Button 
