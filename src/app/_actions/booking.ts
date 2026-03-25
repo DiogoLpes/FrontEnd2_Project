@@ -24,8 +24,8 @@ export async function createBooking(data: any) {
       throw new Error("O tipo de serviço é obrigatório.");
     }
 
-    // 3. Montar a descrição
-    const descricaoFinal = `[${data.subService || "Geral"}] ${data.medidaPneu ? `Medida: ${data.medidaPneu}` : ""} - ${data.extraInfo || ""}`;
+    // 3. Montar a descrição (já vem estruturada do frontend)
+    const descricaoFinal = data.description || "Análise técnica geral.";
 
     // 4. Criar no Prisma
     await prisma.service.create({

@@ -23,7 +23,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className="w-64 border-r border-white/5 bg-[#09090b] hidden md:flex flex-col sticky top-0 h-screen">
         <div className="p-6 flex items-center gap-3">
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-black italic text-white shadow-[0_0_15px_rgba(37,99,235,0.4)]">TS</div>
-          <span className="text-lg font-bold tracking-tighter text-white uppercase">TSPNEUS <span className="text-blue-600 italic font-black">PRO</span></span>
+          <span className="text-lg font-bold tracking-tighter text-white uppercase">TSPNEUS <span className="text-blue-600 italic font-black">ADMIN</span></span>
         </div>
         
         <nav className="flex-1 px-4 space-y-1.5 mt-4">

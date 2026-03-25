@@ -135,7 +135,23 @@ export default function AgendaClient({ userVehicles = [] }: { userVehicles: any[
                 {servico === 'OLEO' && (
                   <div className="grid grid-cols-3 md:grid-cols-5 gap-2 mb-4">
                     {['0W20', '5W30', '5W40', '10W40', '15W40'].map(v => (
-                      <button key={v} type="button" onClick={() => setSubOpcao(v)} className={`py-3 rounded-lg text-[10px] font-black border transition-all ${subOpcao === v ? 'bg-blue-600 border-blue-600 text-white' : 'border-white/10 text-slate-500'}`}>{v}</button>
+                      <button key={v} type="button" onClick={() => setSubOpcao(v)} className={`py-3 rounded-lg text-[10px] font-black border transition-all ${subOpcao === v ? 'bg-blue-600 border-blue-600 text-white' : 'border-white/10 text-slate-500 hover:text-white'}`}>{v}</button>
+                    ))}
+                  </div>
+                )}
+                
+                {servico === 'TRAVOES' && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
+                    {['Pastilhas Frente', 'Pastilhas Trás', 'Discos e Pastilhas', 'Óleo de Travões', 'Ruído a Travar', 'Outro'].map(v => (
+                      <button key={v} type="button" onClick={() => setSubOpcao(v)} className={`py-3 rounded-lg text-[10px] font-black uppercase border transition-all ${subOpcao === v ? 'bg-blue-600 border-blue-600 text-white' : 'border-white/10 text-slate-500 hover:text-white'}`}>{v}</button>
+                    ))}
+                  </div>
+                )}
+                
+                {servico === 'REVISAO' && (
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-4">
+                    {['Check-up Anual', 'Revisão Oficial (Filtros)', 'Inspeção Periódica (IPO)', 'Diagnóstico de Erros'].map(v => (
+                      <button key={v} type="button" onClick={() => setSubOpcao(v)} className={`py-3 rounded-lg text-[10px] font-black uppercase border transition-all ${subOpcao === v ? 'bg-blue-600 border-blue-600 text-white' : 'border-white/10 text-slate-500 hover:text-white'}`}>{v}</button>
                     ))}
                   </div>
                 )}
@@ -144,10 +160,19 @@ export default function AgendaClient({ userVehicles = [] }: { userVehicles: any[
                   <div className="space-y-4 mb-4">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                       {['Económica', 'Premium', 'Performance', 'Alinhamento'].map(p => (
-                        <button key={p} type="button" onClick={() => setSubOpcao(p)} className={`py-3 rounded-lg text-[10px] font-black uppercase border transition-all ${subOpcao === p ? 'bg-blue-600 border-blue-600 text-white' : 'border-white/10 text-slate-500'}`}>{p}</button>
+                        <button key={p} type="button" onClick={() => setSubOpcao(p)} className={`py-3 rounded-lg text-[10px] font-black uppercase border transition-all ${subOpcao === p ? 'bg-blue-600 border-blue-600 text-white' : 'border-white/10 text-slate-500 hover:text-white'}`}>{p}</button>
                       ))}
                     </div>
-                    <input type="text" placeholder="MEDIDA (OPCIONAL)" className="w-full bg-[#14171c] border border-white/5 p-4 rounded-xl text-[11px] font-black uppercase outline-none focus:border-blue-600" onChange={(e) => setMedidaPneu(e.target.value)} />
+                    
+                    <div>
+                      <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mt-4 mb-2">Medidas de Pneu Frequentes</p>
+                      <div className="grid grid-cols-3 md:grid-cols-5 gap-2 mb-3">
+                        {['205/55 R16', '225/45 R17', '195/65 R15', '225/40 R18', '215/55 R17', 'Outra'].map(m => (
+                          <button key={m} type="button" onClick={() => setMedidaPneu(m === 'Outra' ? '' : m)} className={`py-2 rounded-md text-[10px] font-bold border transition-all ${m !== 'Outra' && medidaPneu === m ? 'bg-blue-600/20 border-blue-600 text-blue-400' : 'border-white/5 text-slate-400 hover:text-white hover:bg-white/5'}`}>{m}</button>
+                        ))}
+                      </div>
+                      <input type="text" placeholder="ESCREVA A MEDIDA (EX: 205/55 R16)" value={medidaPneu} className="w-full bg-[#14171c] border border-white/5 p-4 rounded-xl text-[11px] font-black uppercase outline-none focus:border-blue-600 text-white" onChange={(e) => setMedidaPneu(e.target.value)} />
+                    </div>
                   </div>
                 )}
 

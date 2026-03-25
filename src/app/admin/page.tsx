@@ -59,7 +59,7 @@ export default async function AdminDashboard() {
             <div className="h-[250px] flex items-end justify-between gap-2">
               {[50, 80, 40, 95, 70, 85, 30].map((h, i) => (
                 <div key={i} className="flex-1 group relative h-full flex items-end">
-                  <div style={{ height: `${h}%` }} className="bg-white hover:bg-slate-200 transition-colors rounded-sm w-full z-10"></div>
+                  <div style={{ height: `${h}%` }} className="bg-blue-600 hover:bg-blue-500 transition-colors rounded-t-sm w-full z-10"></div>
                 </div>
               ))}
             </div>

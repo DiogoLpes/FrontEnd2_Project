@@ -15,7 +15,8 @@ export default function StatusClient({ bookings }: { bookings: any[] }) {
     { label: "CONCLUIDO", desc: "Pronto", icon: <CheckCircle2 size={18} /> }
   ];
 
-  const currentIdx = steps.findIndex(s => s.label === active.status);
+  const mappedStatus = active.status === "PENDENTE" ? "SOLICITADO" : active.status;
+  const currentIdx = steps.findIndex(s => s.label === mappedStatus);
 
   return (
     <div className="relative min-h-screen pt-28 pb-20 px-4 text-white font-sans selection:bg-blue-600 overflow-hidden">
@@ -43,35 +44,30 @@ export default function StatusClient({ bookings }: { bookings: any[] }) {
         )}
 
         {/* CARD PRINCIPAL (FICHA TÉCNICA) */}
-        <div className="relative bg-white/[0.02] backdrop-blur-2xl border border-white/10 rounded-[3rem] shadow-[0_30px_100px_rgba(0,0,0,0.8)] overflow-hidden mb-6">
-          {/* Decoração de Fundo */}
-          <div className="absolute -top-10 -right-10 opacity-[0.03] pointer-events-none select-none mix-blend-overlay">
-            <h1 className="text-[14rem] font-black italic leading-none">TS</h1>
-          </div>
-
+        <div className="relative bg-[#0d0f14] border border-white/10 rounded-3xl shadow-2xl overflow-hidden mb-6">
           {/* Cabeçalho */}
-          <div className="p-10 pb-6 relative z-10">
-            <div className="flex items-center gap-3 mb-6">
-               <div className="h-[3px] w-12 bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.6)]"></div>
-               <span className="text-blue-400 font-black uppercase text-[11px] tracking-[0.5em]">Tracking System</span>
+          <div className="p-8 pb-6 relative z-10 border-b border-white/5">
+            <div className="flex items-center gap-3 mb-4">
+               <div className="h-1.5 w-8 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.6)]"></div>
+               <span className="text-blue-400 font-bold uppercase text-[10px] tracking-[0.2em]">Ticket #00{active.id}</span>
             </div>
-            <h1 className="text-7xl md:text-8xl font-black italic uppercase tracking-tighter leading-[0.85] text-white">
-              {active.brand} <br/><span className="text-blue-500" style={{WebkitTextStroke: '1px rgba(255,255,255,0.1)'}}>{active.model}</span>
+            <h1 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter leading-none text-white">
+              {active.brand} <span className="text-blue-500/80">{active.model}</span>
             </h1>
-            <div className="mt-10 flex flex-wrap items-center gap-4">
-                <div className="bg-black/50 backdrop-blur-xl px-8 py-4 rounded-2xl border border-white/10 shadow-inner">
-                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1">Unidade</p>
-                    <p className="text-2xl font-black italic text-white tracking-tight">{active.plate}</p>
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+                <div className="bg-black/30 px-6 py-3 rounded-xl border border-white/5">
+                    <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Matrícula</p>
+                    <p className="text-xl font-bold italic text-white tracking-tight">{active.plate}</p>
                 </div>
-                <div className="bg-black/50 backdrop-blur-xl px-8 py-4 rounded-2xl border border-white/10 shadow-inner">
-                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1">Intervenção</p>
-                    <p className="text-2xl font-black italic text-blue-400 tracking-tight">{active.type}</p>
+                <div className="bg-black/30 px-6 py-3 rounded-xl border border-white/5">
+                    <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Intervenção</p>
+                    <p className="text-xl font-bold italic text-blue-400 tracking-tight">{active.type}</p>
                 </div>
             </div>
           </div>
 
           {/* STEPPER DINÂMICO */}
-          <div className="px-8 py-10 relative">
+          <div className="px-8 py-8 relative">
             <div className="grid grid-cols-4 gap-3 relative">
               {steps.map((step, idx) => {
                 const isDone = idx < currentIdx;
@@ -103,34 +99,33 @@ export default function StatusClient({ bookings }: { bookings: any[] }) {
           </div>
 
           {/* RESULTADO (ORÇAMENTO) */}
-          <div className="p-8 bg-gradient-to-t from-black/80 to-transparent relative z-10 border-t border-white/5 mt-4">
-            {active.status === "ORCAMENTADO" ? (
-              <div className="bg-blue-600 rounded-[2rem] p-8 text-white relative overflow-hidden group shadow-[0_20px_50px_rgba(37,99,235,0.4)]">
-                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 mix-blend-overlay"></div>
+          <div className="p-6 bg-[#07090c] relative z-10 border-t border-white/5">
+            {currentIdx >= 1 ? (
+              <div className="bg-blue-600/10 border border-blue-500/20 rounded-2xl p-6 relative overflow-hidden group">
                  <div className="relative z-10">
-                    <h3 className="font-black italic uppercase text-2xl mb-6 flex items-center gap-3">
-                       <Calendar size={28}/> Proposta Comercial
+                    <h3 className="font-bold uppercase text-lg mb-4 text-blue-400 flex items-center gap-2">
+                       <Calendar size={18}/> Detalhes Financeiros e de Agendamento
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-black/30 backdrop-blur-xl p-6 rounded-[1.5rem] border border-white/10 hover:bg-black/40 transition-colors">
-                            <p className="text-[10px] font-black uppercase text-white/50 mb-2 tracking-[0.3em]">Valor Final</p>
-                            <p className="text-4xl font-black italic tracking-tighter text-white">{active.price ? `${active.price}€` : "A DEFINIR"}</p>
+                        <div className="bg-black/50 p-4 rounded-xl border border-white/5">
+                            <p className="text-[10px] uppercase text-slate-400 mb-1 tracking-wider">Valor Final</p>
+                            <p className="text-2xl font-black text-white">{active.price ? `${active.price}€` : "A DEFINIR"}</p>
                         </div>
-                        <div className="bg-black/30 backdrop-blur-xl p-6 rounded-[1.5rem] border border-white/10 hover:bg-black/40 transition-colors">
-                            <p className="text-[10px] font-black uppercase text-white/50 mb-2 tracking-[0.3em]">Agendamento Aprovado</p>
-                            <p className="text-2xl font-black italic leading-none uppercase text-white">
+                        <div className="bg-black/50 p-4 rounded-xl border border-white/5">
+                            <p className="text-[10px] uppercase text-slate-400 mb-1 tracking-wider">Agendamento Oficial</p>
+                            <p className="text-lg font-bold uppercase text-white leading-tight">
                                 {active.date ? new Date(active.date).toLocaleDateString() : 'A VALIDAR'}<br/>
-                                <span className="text-base text-blue-200 opacity-80">{active.date ? new Date(active.date).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '--:--'}h</span>
+                                <span className="text-sm text-blue-300 font-medium">{active.date ? new Date(active.date).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '--:--'}</span>
                             </p>
                         </div>
                     </div>
                  </div>
               </div>
             ) : (
-              <div className="border border-white/10 bg-black/40 backdrop-blur-md rounded-[2rem] p-10 text-center border-dashed">
-                <p className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 italic leading-relaxed">
-                  O Armindo está a analisar a sua viatura.<br/>
-                  <span className="text-blue-500 mt-2 block">Receberá os detalhes técnicos aqui em breve.</span>
+              <div className="bg-black/40 rounded-2xl p-8 text-center border border-dashed border-white/10">
+                <p className="text-xs uppercase tracking-widest text-slate-400">
+                  O painel aguarda validação da oficina.<br/>
+                  <span className="text-blue-500 font-bold mt-1 block">Receberá atualizações aqui em breve.</span>
                 </p>
               </div>
             )}
@@ -138,7 +133,7 @@ export default function StatusClient({ bookings }: { bookings: any[] }) {
         </div>
 
         {/* NOTAS TÉCNICAS */}
-        <div className="p-8 bg-white/[0.02] backdrop-blur-xl border border-white/10 rounded-[2.5rem] flex flex-col md:flex-row items-start gap-8 shadow-2xl">
+        <div className="p-6 bg-[#0a0c10] border border-white/10 rounded-2xl flex flex-col md:flex-row items-center gap-6 shadow-xl">
             <div className="bg-blue-600/20 p-5 rounded-3xl border border-blue-500/30">
                 <Gauge className="text-blue-400" size={32} />
             </div>
