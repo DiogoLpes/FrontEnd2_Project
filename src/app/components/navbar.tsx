@@ -17,9 +17,19 @@ export default function Navbar() {
 
   const user = session?.user;
   const firstName = user?.name?.split(" ")[0] || "Cliente";
+  const isAdmin = user?.email?.toLowerCase() === "admin@local.com";
 
-  // Esconder Navbar nas páginas de Admin
-  if (pathname?.startsWith("/admin")) return null;
+  // DEFINIR LINKS DEPENDENDO SE É ADMIN
+  const navLinks = isAdmin ? [
+    { name: "Painel Admin", path: "/admin" },
+    { name: "Lista de Agendamentos", path: "/admin/agendamentos" },
+    { name: "Base de Clientes", path: "/admin/clientes" },
+    { name: "Ver Site Público", path: "/" }
+  ] : [
+    { name: "Início", path: "/" },
+    { name: "Rastreio", path: "/tracking" },
+    { name: "Agendar", path: "/agenda" }
+  ];
 
   // FUNÇÃO PARA PROTEGER CLIQUES NA HOME
   const handleProtectedNavigation = (e: React.MouseEvent, path: string) => {
@@ -66,18 +76,24 @@ export default function Navbar() {
 
         {/* LINKS COM PROTEÇÃO NO CLIQUE */}
         <div className="hidden lg:flex items-center gap-8">
-          {[
-            { name: "Início", path: "/" },
-            { name: "Rastreio", path: "/tracking" },
-            { name: "Agendar", path: "/agenda" }
-          ].map((item) => (
+          {navLinks.map((item) => (
             <button 
               key={item.name} 
-              onClick={(e) => (item.path === "/" || item.path === "/Services") ? router.push(item.path) : handleProtectedNavigation(e, item.path)}
-              className="text-sm font-black uppercase italic tracking-widest text-slate-300 hover:text-blue-600 transition-all relative group"
+              onClick={(e) => {
+                if (isAdmin || item.path === "/" || item.path === "/Services") {
+                  router.push(item.path);
+                } else {
+                  handleProtectedNavigation(e, item.path);
+                }
+              }}
+              className={`text-sm font-black uppercase italic tracking-widest transition-all relative group ${
+                pathname === item.path ? "text-blue-500" : "text-slate-300 hover:text-blue-600"
+              }`}
             >
               {item.name}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all" />
+              <span className={`absolute -bottom-1 left-0 h-0.5 bg-blue-600 transition-all ${
+                pathname === item.path ? "w-full" : "w-0 group-hover:w-full"
+              }`} />
             </button>
           ))}
         </div>
@@ -128,20 +144,20 @@ export default function Navbar() {
       {/* MOBILE MENU */}
       {isOpen && (
         <div className="lg:hidden bg-[#0a0c10] border-b-2 border-blue-600 p-6 flex flex-col gap-6 animate-in slide-in-from-top-4 shadow-2xl">
-          {[
-            { name: "Início", path: "/" },
-            { name: "Rastreio", path: "/tracking" },
-            { name: "Agendar", path: "/agenda" }
-          ].map((item) => (
+          {navLinks.map((item) => (
             <button 
               key={item.name} 
               onClick={(e) => {
-                if (item.path === "/" || item.path === "/Services") {
+                if (isAdmin || item.path === "/" || item.path === "/Services") {
                   router.push(item.path);
                   setIsOpen(false);
-                } else handleProtectedNavigation(e, item.path);
+                } else {
+                  handleProtectedNavigation(e, item.path);
+                }
               }}
-              className="text-xl font-black uppercase italic tracking-widest text-white hover:text-blue-600 text-left"
+              className={`text-xl font-black uppercase italic tracking-widest text-left ${
+                pathname === item.path ? "text-blue-500" : "text-white hover:text-blue-600"
+              }`}
             >
               {item.name}
             </button>

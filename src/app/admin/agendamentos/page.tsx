@@ -180,40 +180,40 @@ export default function AdminAgendamentos() {
   };
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
+    <div className="p-4 md:p-8 pt-24 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 relative z-10">
       
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black uppercase italic text-white tracking-tighter">
-            Controlo de <span className="text-blue-600">Oficina</span>
+          <h1 className="text-5xl md:text-6xl font-black uppercase italic text-white tracking-tighter">
+            Tracking de <span className="text-blue-600">Serviços</span>
           </h1>
-          <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">Painel Administrativo TS PNEUS</p>
+          <p className="text-blue-500 text-[10px] font-black uppercase tracking-[0.4em] mt-2">Painel de Controlo da Oficina</p>
         </div>
       </div>
 
       {/* LISTAGEM */}
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 gap-6">
         {loading ? (
-          <div className="text-center p-20 text-blue-600 animate-pulse font-black uppercase italic">A sincronizar com a base de dados...</div>
+          <div className="text-center p-20 text-blue-600 animate-pulse font-black uppercase italic tracking-widest text-lg">A sincronizar com a base de dados...</div>
         ) : (
           services.map((s: ServiceEntry) => (
-            <div key={s.id} className="bg-[#0d1117] border border-white/5 p-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 hover:border-blue-600/30 transition-all group relative overflow-hidden">
+            <div key={s.id} className="bg-white/[0.02] backdrop-blur-2xl border border-white/10 p-6 md:p-8 rounded-3xl flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 hover:bg-white/[0.04] transition-all duration-300 group relative overflow-hidden shadow-2xl">
               
-              <div className={`absolute left-0 top-0 h-full w-1 ${
-                s.status === 'PENDENTE' || s.status === 'SOLICITADO' ? 'bg-white/20' : 
-                s.status === 'ORCAMENTADO' ? 'bg-orange-500' : 
-                s.status === 'EM_REPARACAO' ? 'bg-blue-500' : 'bg-green-500'
+              <div className={`absolute left-0 top-0 h-full w-2 transition-colors ${
+                s.status === 'PENDENTE' || s.status === 'SOLICITADO' ? 'bg-white/40 shadow-[0_0_15px_rgba(255,255,255,0.3)]' : 
+                s.status === 'ORCAMENTADO' ? 'bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.5)]' : 
+                s.status === 'EM_REPARACAO' ? 'bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.5)]' : 'bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.5)]'
               }`}></div>
 
-              <div className="flex gap-5 flex-1 text-white">
-                <div className={`w-14 h-14 flex items-center justify-center border transition-colors ${
-                  s.status === 'PENDENTE' ? 'bg-white/5 border-white/10 text-white' :
-                  s.status === 'ORCAMENTADO' ? 'bg-orange-500/5 border-orange-500/20 text-orange-500' : 
-                  s.status === 'EM_REPARACAO' ? 'bg-blue-500/5 border-blue-500/20 text-blue-500' : 
-                  'bg-green-500/5 border-green-500/20 text-green-500'
+              <div className="flex gap-6 flex-1 text-white ml-2">
+                <div className={`w-16 h-16 flex-shrink-0 rounded-2xl flex items-center justify-center border transition-colors shadow-inner ${
+                  s.status === 'PENDENTE' || s.status === 'SOLICITADO' ? 'bg-white/5 border-white/20 text-white' :
+                  s.status === 'ORCAMENTADO' ? 'bg-orange-500/10 border-orange-500/30 text-orange-500' : 
+                  s.status === 'EM_REPARACAO' ? 'bg-blue-500/10 border-blue-500/30 text-blue-500' : 
+                  'bg-green-500/10 border-green-500/30 text-green-500'
                 }`}>
-                  <Car size={28} />
+                  <Car size={32} />
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
@@ -235,13 +235,17 @@ export default function AdminAgendamentos() {
                 </div>
               </div>
 
-              <div className="flex flex-col lg:items-end min-w-[150px]">
-                  <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-1">
-                    <Wrench size={10} /> {s.type}
+              <div className="flex flex-col lg:items-end min-w-[150px] bg-black/20 p-4 rounded-2xl border border-white/5">
+                  <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest flex items-center gap-1.5 mb-1">
+                    <Wrench size={12} /> {s.type}
                   </span>
-                  {s.price && (
-                    <div className="flex items-center gap-1 text-green-500 font-black text-xl italic tracking-tighter mt-1">
+                  {s.price ? (
+                    <div className="flex items-center gap-1 text-white font-black text-3xl italic tracking-tighter">
                        {Number(s.price).toFixed(2)}€
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1 text-slate-500 font-black text-xs uppercase tracking-widest mt-1">
+                       A AGUARDAR ORÇAMENTO
                     </div>
                   )}
               </div>
@@ -251,16 +255,16 @@ export default function AdminAgendamentos() {
                   {s.status === 'PENDENTE' || s.status === 'SOLICITADO' ? (
                     <button 
                       onClick={() => handleDarOrcamento(s.id)}
-                      className="w-full bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase p-3 transition-all flex items-center justify-center gap-2"
+                      className="w-full bg-blue-600 hover:bg-white text-white hover:text-black rounded-xl text-[10px] font-black uppercase py-4 px-3 transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_20px_rgba(255,255,255,0.4)]"
                     >
-                      <Euro size={14} /> Dar Orçamento
+                      <Euro size={16} /> Dar Orçamento Formal
                     </button>
                   ) : (
                     <div className="relative">
                       <select 
                         value={s.status}
                         onChange={(e) => updateStatus(s.id, e.target.value)}
-                        className="w-full bg-black/40 border border-white/10 text-[10px] font-black uppercase p-3 outline-none cursor-pointer appearance-none text-white"
+                        className="w-full bg-black/60 border border-white/10 rounded-xl text-[10px] font-black uppercase py-4 px-4 outline-none cursor-pointer appearance-none text-white focus:border-blue-500 transition-colors"
                       >
                         <option value="ORCAMENTADO">ORÇAMENTADO</option>
                         <option value="EM_REPARACAO">EM REPARAÇÃO</option>
@@ -269,7 +273,7 @@ export default function AdminAgendamentos() {
                     </div>
                   )}
                 </div>
-                <button onClick={() => handlePrint(s)} className="p-3 bg-white/5 border border-white/10 text-slate-400 rounded-sm">
+                <button onClick={() => handlePrint(s)} className="p-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl transition-colors shadow-inner" title="Imprimir Ficha Técnica">
                   <Printer size={18} />
                 </button>
               </div>
