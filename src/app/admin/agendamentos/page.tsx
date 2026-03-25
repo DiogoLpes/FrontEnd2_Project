@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { 
-  Calendar, 
-  Car, 
-  User, 
-  Clock, 
+import {
+  Calendar,
+  Car,
+  User,
+  Clock,
   AlertCircle,
   Wrench,
   Search,
@@ -93,21 +93,21 @@ export default function AdminAgendamentos() {
       try {
         const res = await fetch("/api/services", {
           method: "PATCH",
-          body: JSON.stringify({ 
-            id: serviceId, 
-            status: "ORCAMENTADO", 
-            price: parseFloat(formValues.price), 
-            date: formValues.date 
+          body: JSON.stringify({
+            id: serviceId,
+            status: "ORCAMENTADO",
+            price: parseFloat(formValues.price),
+            date: formValues.date
           }),
           headers: { "Content-Type": "application/json" },
         });
 
         if (res.ok) {
-          Swal.fire({ 
-            icon: 'success', 
-            title: 'ORÇAMENTO DEFINIDO', 
+          Swal.fire({
+            icon: 'success',
+            title: 'ORÇAMENTO DEFINIDO',
             text: `Valor de ${formValues.price}€ registado.`,
-            background: "#0d1117", 
+            background: "#0d1117",
             color: "#fff",
             timer: 2000
           });
@@ -126,7 +126,7 @@ export default function AdminAgendamentos() {
         body: JSON.stringify({ id, status: newStatus }),
         headers: { "Content-Type": "application/json" },
       });
-      
+
       if (res.ok) {
         const Toast = Swal.mixin({
           toast: true,
@@ -178,7 +178,7 @@ export default function AdminAgendamentos() {
 
   return (
     <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
-      
+
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-4">
         <div>
@@ -194,16 +194,15 @@ export default function AdminAgendamentos() {
         ) : (
           services.map((s: ServiceEntry) => (
             <div key={s.id} className="bg-[#09090b] border border-white/10 p-5 rounded-lg flex flex-col xl:flex-row justify-between xl:items-center gap-6 hover:bg-[#101013] transition-colors relative">
-              
-              <div className={`absolute left-0 top-0 h-full w-1 rounded-l-lg ${
-                s.status === 'PENDENTE' || s.status === 'SOLICITADO' ? 'bg-slate-600' : 
-                s.status === 'ORCAMENTADO' ? 'bg-amber-500' : 
-                s.status === 'EM_REPARACAO' ? 'bg-blue-500' : 'bg-emerald-500'
-              }`}></div>
+
+              <div className={`absolute left-0 top-0 h-full w-1 rounded-l-lg ${s.status === 'PENDENTE' || s.status === 'SOLICITADO' ? 'bg-slate-600' :
+                  s.status === 'ORCAMENTADO' ? 'bg-amber-500' :
+                    s.status === 'EM_REPARACAO' ? 'bg-blue-500' : 'bg-emerald-500'
+                }`}></div>
 
               <div className="flex gap-4 flex-1 text-white ml-2">
-                <div className="w-12 h-12 flex-shrink-0 rounded-md flex items-center justify-center bg-slate-900 border border-slate-800 text-slate-400">
-                  <Car size={24} />
+                <div className="w-16 h-16 flex-shrink-0 rounded-xl flex items-center justify-center bg-slate-900 border border-slate-800 text-slate-400 shadow-inner">
+                  <Car size={32} />
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
@@ -216,7 +215,7 @@ export default function AdminAgendamentos() {
                   </div>
                   <div className="mt-3">
                     <p className="text-slate-400 text-xs font-medium flex items-center gap-1.5">
-                      <User size={14} className="text-slate-500" /> 
+                      <User size={14} className="text-slate-500" />
                       Proprietário: <span className="text-white">{s.vehicle?.user?.name || "Desconhecido"}</span>
                     </p>
                     <p className="text-slate-500 text-xs italic mt-1.5 line-clamp-2">
@@ -227,24 +226,24 @@ export default function AdminAgendamentos() {
               </div>
 
               <div className="flex flex-col xl:items-end min-w-[150px]">
-                  <span className="text-xs font-medium text-blue-500 uppercase tracking-wider flex items-baseline gap-1.5 mb-1">
-                    <Wrench size={10} /> {s.type}
-                  </span>
-                  {s.price ? (
-                    <div className="flex items-center gap-1 text-white font-bold text-2xl">
-                       {Number(s.price).toFixed(2)}€
-                    </div>
-                  ) : (
-                    <div className="flex items-center mt-2">
-                       <span className="text-slate-500 text-[10px] font-medium uppercase bg-slate-800/50 px-2 py-1 rounded inline-block">Aguardando Avaliação</span>
-                    </div>
-                  )}
+                <span className="text-xs font-medium text-blue-500 uppercase tracking-wider flex items-baseline gap-1.5 mb-1">
+                  <Wrench size={10} /> {s.type}
+                </span>
+                {s.price ? (
+                  <div className="flex items-center gap-1 text-white font-bold text-2xl">
+                    {Number(s.price).toFixed(2)}€
+                  </div>
+                ) : (
+                  <div className="flex items-center mt-2">
+                    <span className="text-slate-500 text-[10px] font-medium uppercase bg-slate-800/50 px-2 py-1 rounded inline-block">Aguardando Avaliação</span>
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center gap-3 w-full xl:w-72">
                 <div className="flex-1">
                   {s.status === 'PENDENTE' || s.status === 'SOLICITADO' ? (
-                    <button 
+                    <button
                       onClick={() => handleDarOrcamento(s.id)}
                       className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-md text-xs font-medium py-2 px-3 transition-colors flex items-center justify-center gap-2"
                     >
@@ -252,7 +251,7 @@ export default function AdminAgendamentos() {
                     </button>
                   ) : (
                     <div className="relative">
-                      <select 
+                      <select
                         value={s.status}
                         onChange={(e) => updateStatus(s.id, e.target.value)}
                         className="w-full bg-slate-950 border border-slate-800 rounded-md text-xs font-medium py-2.5 px-3 outline-none cursor-pointer appearance-none text-slate-200 focus:border-blue-600 hover:border-slate-700 transition-all"

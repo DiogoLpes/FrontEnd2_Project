@@ -158,20 +158,32 @@ export default function AgendaClient({ userVehicles = [] }: { userVehicles: any[
 
                 {servico === 'PNEUS' && (
                   <div className="space-y-4 mb-4">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {['Económica', 'Premium', 'Performance', 'Alinhamento'].map(p => (
-                        <button key={p} type="button" onClick={() => setSubOpcao(p)} className={`py-3 rounded-lg text-[10px] font-black uppercase border transition-all ${subOpcao === p ? 'bg-blue-600 border-blue-600 text-white' : 'border-white/10 text-slate-500 hover:text-white'}`}>{p}</button>
-                      ))}
+                    <div>
+                      <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Perfil de Pneu</p>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        {['Económica', 'Premium', 'Performance', 'All-Season', '4x4 / SUV', 'Carrinha'].map(p => (
+                          <button key={p} type="button" onClick={() => setSubOpcao(p)} className={`py-3 rounded-lg text-[10px] font-black uppercase border transition-all ${subOpcao === p ? 'bg-blue-600 border-blue-600 text-white' : 'border-white/10 text-slate-500 hover:text-white hover:bg-white/5'}`}>{p}</button>
+                        ))}
+                      </div>
                     </div>
                     
                     <div>
                       <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mt-4 mb-2">Medidas de Pneu Frequentes</p>
-                      <div className="grid grid-cols-3 md:grid-cols-5 gap-2 mb-3">
-                        {['205/55 R16', '225/45 R17', '195/65 R15', '225/40 R18', '215/55 R17', 'Outra'].map(m => (
+                      <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-2 mb-3">
+                        {['205/55 R16', '225/45 R17', '195/65 R15', '225/40 R18', '215/55 R17', '185/65 R15', '235/45 R18', '205/60 R16', '175/65 R14', 'Outra'].map(m => (
                           <button key={m} type="button" onClick={() => setMedidaPneu(m === 'Outra' ? '' : m)} className={`py-2 rounded-md text-[10px] font-bold border transition-all ${m !== 'Outra' && medidaPneu === m ? 'bg-blue-600/20 border-blue-600 text-blue-400' : 'border-white/5 text-slate-400 hover:text-white hover:bg-white/5'}`}>{m}</button>
                         ))}
                       </div>
-                      <input type="text" placeholder="ESCREVA A MEDIDA (EX: 205/55 R16)" value={medidaPneu} className="w-full bg-[#14171c] border border-white/5 p-4 rounded-xl text-[11px] font-black uppercase outline-none focus:border-blue-600 text-white" onChange={(e) => setMedidaPneu(e.target.value)} />
+                      <div className="relative">
+                        <input 
+                          type="text" 
+                          placeholder="ESCREVA A MEDIDA (EX: 205/55 R16)" 
+                          value={medidaPneu} 
+                          className="w-full bg-[#14171c] border border-white/5 p-4 rounded-xl text-[11px] font-black uppercase outline-none focus:border-blue-600 text-white placeholder:text-slate-600" 
+                          onChange={(e) => setMedidaPneu(e.target.value)} 
+                        />
+                        {medidaPneu && <div className="absolute right-4 top-1/2 -translate-y-1/2 bg-blue-600 w-2 h-2 rounded-full animate-pulse"></div>}
+                      </div>
                     </div>
                   </div>
                 )}
