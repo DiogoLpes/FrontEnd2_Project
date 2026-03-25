@@ -55,25 +55,32 @@ export default function AdminAgendamentos() {
 
   const handleDarOrcamento = async (serviceId: number) => {
     const { value: formValues } = await Swal.fire({
-      title: '<span class="text-white font-black italic uppercase tracking-tighter">Enviar Orçamento</span>',
-      background: "#0d1117",
+      title: '<span class="text-white font-black italic uppercase tracking-tighter text-3xl">Proposta de Serviço</span>',
+      background: "rgba(10, 12, 16, 0.95)",
       color: "#fff",
+      customClass: {
+        popup: 'border border-blue-500/20 rounded-[2.5rem] shadow-[0_30px_100px_rgba(0,0,0,0.9)] backdrop-blur-3xl p-6',
+        confirmButton: 'rounded-xl uppercase font-black italic text-xs tracking-widest hover:scale-105 transition-transform'
+      },
       html: `
-        <div class="flex flex-col gap-4 p-2 text-left">
-          <div>
-            <label class="text-[10px] font-black uppercase text-blue-500 tracking-widest">Valor do Serviço (€)</label>
-            <input id="swal-price" type="number" step="0.01" class="swal2-input !m-0 !mt-1 !w-full !bg-black/40 !border-white/10 !text-white !text-sm focus:!border-blue-600 outline-none" placeholder="Ex: 50.00">
+        <div class="flex flex-col gap-5 p-2 text-left mt-4">
+          <div class="bg-white/[0.02] p-5 rounded-2xl border border-white/5">
+            <label class="text-[9px] font-black uppercase text-blue-500 tracking-[0.3em] mb-3 block">Orçamento Final (€)</label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 font-black text-xl">€</span>
+              <input id="swal-price" type="number" step="0.01" class="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white text-3xl font-black italic tracking-tighter focus:border-blue-500 focus:bg-black/60 outline-none transition-all shadow-inner" placeholder="0.00">
+            </div>
           </div>
-          <div>
-            <label class="text-[10px] font-black uppercase text-blue-500 tracking-widest">Data Sugerida</label>
-            <input id="swal-date" type="datetime-local" class="swal2-input !m-0 !mt-1 !w-full !bg-black/40 !border-white/10 !text-white !text-sm focus:!border-blue-600 outline-none">
+          <div class="bg-white/[0.02] p-5 rounded-2xl border border-white/5">
+            <label class="text-[9px] font-black uppercase text-blue-500 tracking-[0.3em] mb-3 block">Agendamento (Data / Hora)</label>
+            <input id="swal-date" type="datetime-local" class="w-full bg-black/40 border border-white/10 rounded-xl py-3 px-4 text-white text-sm font-bold uppercase tracking-wider focus:border-blue-500 focus:bg-black/60 outline-none transition-all shadow-inner">
           </div>
         </div>
       `,
       showCancelButton: true,
-      confirmButtonText: 'ENVIAR PARA CLIENTE',
+      confirmButtonText: 'APROVAR & NOTIFICAR CLIENTE',
       confirmButtonColor: '#2563eb',
-      cancelButtonText: 'VOLTAR',
+      cancelButtonText: 'CANCELAR',
       cancelButtonColor: 'transparent',
       preConfirm: () => {
         const price = (document.getElementById('swal-price') as HTMLInputElement).value;
@@ -217,9 +224,14 @@ export default function AdminAgendamentos() {
                       {s.vehicle?.plate}
                     </span>
                   </div>
-                  <p className="text-slate-400 text-[10px] font-bold uppercase flex items-center gap-1.5">
-                    <User size={12} className="text-slate-600" /> {s.vehicle?.owner?.name || "N/D"} 
-                  </p>
+                  <div className="mt-4 bg-black/40 backdrop-blur-md border border-white/5 rounded-2xl p-4 shadow-inner">
+                    <p className="text-blue-500 text-[10px] font-black uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                      <User size={14} /> Detalhes do Condutor: <span className="text-white text-xs">{s.vehicle?.owner?.name || "Desconhecido"}</span>
+                    </p>
+                    <p className="text-slate-300 text-[11px] font-bold uppercase italic leading-relaxed tracking-wider border-l-2 border-white/10 pl-3 mt-3">
+                      {s.description ? `"${s.description}"` : "Nenhum reporte adicional assinalado."}
+                    </p>
+                  </div>
                 </div>
               </div>
 

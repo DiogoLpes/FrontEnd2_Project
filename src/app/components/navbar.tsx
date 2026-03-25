@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "./ui/button"; 
 import { Menu, X, Car, User, LogOut, ChevronDown, ShieldAlert } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Swal from "sweetalert2";
 
 export default function Navbar() {
@@ -13,9 +13,13 @@ export default function Navbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { data: session } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
 
   const user = session?.user;
   const firstName = user?.name?.split(" ")[0] || "Cliente";
+
+  // Esconder Navbar nas páginas de Admin
+  if (pathname?.startsWith("/admin")) return null;
 
   // FUNÇÃO PARA PROTEGER CLIQUES NA HOME
   const handleProtectedNavigation = (e: React.MouseEvent, path: string) => {

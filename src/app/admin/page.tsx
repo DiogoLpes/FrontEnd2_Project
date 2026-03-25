@@ -49,43 +49,43 @@ export default async function AdminDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* GRÁFICO SHADCN (SIMULADO COM TAILWIND) */}
-        <Card className="lg:col-span-2 bg-[#09090b] border-white/5">
-          <CardHeader>
-            <CardTitle className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-              <TrendingUp className="text-blue-500" size={16} /> Performance Semanal
+        <Card className="lg:col-span-2 bg-white/[0.02] backdrop-blur-2xl border-white/10 shadow-2xl rounded-3xl overflow-hidden">
+          <CardHeader className="bg-black/20 border-b border-white/5 py-5">
+            <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-3 text-white">
+              <TrendingUp className="text-blue-500" size={18} /> Fluxo de Reparações Semanal
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="h-[250px] flex items-end justify-between gap-3 pt-4">
+          <CardContent className="p-8">
+            <div className="h-[250px] flex items-end justify-between gap-4">
               {[50, 80, 40, 95, 70, 85, 30].map((h, i) => (
-                <div key={i} className="flex-1 group relative">
-                  <div style={{ height: `${h}%` }} className="bg-blue-600/20 group-hover:bg-blue-600/40 transition-all rounded-t-lg w-full absolute bottom-0"></div>
-                  <div style={{ height: `${h-10}%` }} className="bg-blue-600 w-full rounded-t-lg transition-all absolute bottom-0 shadow-[0_0_15px_rgba(37,99,235,0.3)]"></div>
+                <div key={i} className="flex-1 group relative h-full flex items-end">
+                  <div className="absolute inset-0 bg-white/5 rounded-t-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div style={{ height: `${h}%` }} className="bg-gradient-to-t from-blue-600/20 to-blue-500/40 border-t-2 border-blue-400 group-hover:from-blue-600/40 group-hover:to-blue-400/60 transition-all rounded-t-xl w-full z-10 shadow-[0_0_20px_rgba(59,130,246,0.2)]"></div>
                 </div>
               ))}
             </div>
-            <div className="flex justify-between mt-4 text-[10px] font-black text-slate-600 uppercase">
+            <div className="flex justify-between mt-6 text-[10px] font-black text-slate-500 uppercase tracking-widest">
               <span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span><span>Dom</span>
             </div>
           </CardContent>
         </Card>
 
         {/* ÚLTIMAS ENTRADAS */}
-        <Card className="bg-[#09090b] border-white/5">
-          <CardHeader>
-            <CardTitle className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-              <Clock className="text-blue-500" size={16} /> Últimos Pedidos
+        <Card className="bg-white/[0.02] backdrop-blur-2xl border-white/10 shadow-2xl rounded-3xl overflow-hidden">
+          <CardHeader className="bg-black/20 border-b border-white/5 py-5">
+            <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-3 text-white">
+              <Clock className="text-blue-500" size={18} /> Últimos Registos
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 p-6">
             {servicos.slice(0, 5).map((s: any) => (
-              <div key={s.id} className="flex items-center justify-between group">
+              <div key={s.id} className="flex items-center justify-between group p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-blue-500/30 transition-colors">
                 <div>
-                  <p className="text-xs font-bold text-white uppercase">{s.vehicle?.plate}</p>
-                  <p className="text-[10px] text-slate-500 uppercase">{s.type}</p>
+                  <p className="text-sm font-black text-white uppercase tracking-tight">{s.vehicle?.plate}</p>
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">{s.type}</p>
                 </div>
-                <div className={`text-[9px] font-black px-2 py-1 rounded ${
-                  s.status === 'PENDENTE' ? 'bg-amber-500/10 text-amber-500' : 'bg-blue-500/10 text-blue-500'
+                <div className={`text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider shadow-inner ${
+                  s.status === 'PENDENTE' ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' : 'bg-blue-500/10 text-blue-500 border border-blue-500/20'
                 }`}>
                   {s.status}
                 </div>
@@ -101,19 +101,20 @@ export default async function AdminDashboard() {
 
 function MetricCard({ title, value, icon, color, alert }: any) {
   const colors: any = {
-    blue: "border-blue-600/20 text-blue-600",
-    amber: "border-amber-600/20 text-amber-600",
-    emerald: "border-emerald-600/20 text-emerald-600",
+    blue: "border-blue-500/30 text-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.15)]",
+    amber: "border-amber-500/30 text-amber-500 shadow-[0_0_30px_rgba(245,158,11,0.15)]",
+    emerald: "border-emerald-500/30 text-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.15)]",
   };
+  
   return (
-    <div className={`bg-[#09090b] border ${alert ? 'border-amber-600/50 animate-pulse' : 'border-white/5'} p-6 rounded-2xl relative overflow-hidden group`}>
-      <div className={`absolute -right-4 -top-4 opacity-5 group-hover:scale-110 transition-transform ${colors[color]}`}>
-        {React.cloneElement(icon, { size: 80 })}
+    <div className={`bg-white/[0.02] backdrop-blur-3xl border ${alert ? 'border-amber-500/50 animate-pulse' : 'border-white/10'} p-8 rounded-[2rem] relative overflow-hidden group hover:bg-white/[0.04] transition-all`}>
+      <div className={`absolute -right-6 -top-6 opacity-[0.07] group-hover:scale-125 transition-transform duration-700 ${colors[color]}`}>
+        {React.cloneElement(icon, { size: 120 })}
       </div>
-      <p className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-1">{title}</p>
-      <div className="flex items-baseline gap-2">
-        <h2 className="text-4xl font-black italic tracking-tighter text-white">{value}</h2>
-        {alert && <span className="text-[10px] font-bold text-amber-500 italic">ACTION REQ.</span>}
+      <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-2">{title}</p>
+      <div className="flex items-baseline gap-3 relative z-10">
+        <h2 className={`text-6xl font-black italic tracking-tighter ${alert ? 'text-amber-500' : 'text-white'}`}>{value}</h2>
+        {alert && <span className="text-[9px] px-2 py-1 bg-amber-500/20 rounded border border-amber-500/30 font-black text-amber-500 uppercase tracking-widest">Ação Necessária</span>}
       </div>
     </div>
   );
