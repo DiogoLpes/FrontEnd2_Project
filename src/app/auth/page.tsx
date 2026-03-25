@@ -148,9 +148,12 @@ function AuthContent() {
 
     toast("SUCESSO", "Login efetuado!", "success");
 
- 
     setTimeout(() => {
-      window.location.href = "/";
+      if (formData.email.toLowerCase() === "admin@local.com") {
+        window.location.href = "/admin";
+      } else {
+        window.location.href = "/";
+      }
     }, 300);
   };
 

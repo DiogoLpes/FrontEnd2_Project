@@ -18,7 +18,12 @@ export default async function AdminDashboard() {
   const concluidos = servicos.filter((s: any) => s.status === "CONCLUIDO").length;
   const emReparacao = servicos.filter((s: any) => s.status === "EM_REPARACAO").length;
   return (
-    <div className="p-6 space-y-8 bg-[#05070a] min-h-screen text-white">
+    <div className="p-6 space-y-8 min-h-screen text-white relative selection:bg-blue-600/30 overflow-hidden">
+      {/* Background Overlay */}
+      <div className="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1597551681492-10c86e481048?q=80&w=2000')] bg-cover bg-center bg-fixed opacity-10" />
+      <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#05070a]/90 via-[#05070a]/95 to-[#05070a]" />
+      
+      <div className="relative z-10 max-w-7xl mx-auto space-y-8">
       {/* HEADER DINÂMICO */}
       <div className="flex justify-between items-end">
         <div>
@@ -88,6 +93,7 @@ export default async function AdminDashboard() {
             ))}
           </CardContent>
         </Card>
+      </div>
       </div>
     </div>
   );

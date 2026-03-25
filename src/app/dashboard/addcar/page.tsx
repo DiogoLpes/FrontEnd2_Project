@@ -43,78 +43,79 @@ export default function AddVehicleModal({ isOpen, onClose, onSubmit, loading }: 
   const style = PLATE_STYLES[plateType];
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md">
-      <div className="bg-[#0d0f14] border border-white/10 w-full max-w-2xl p-10 relative shadow-2xl overflow-y-auto max-h-[90vh] rounded-[3rem]">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
+      <div className="bg-[#0a0c10] border border-white/10 w-full max-w-md p-6 relative shadow-[0_0_50px_rgba(37,99,235,0.1)] overflow-y-auto max-h-[90vh] rounded-3xl animate-in zoom-in-95 duration-300">
         
-        <button onClick={onClose} className="absolute top-8 right-8 text-slate-500 hover:text-white transition-all"><X size={28} /></button>
+        <button onClick={onClose} className="absolute top-4 right-4 text-slate-500 hover:text-white transition-all bg-white/5 p-2 rounded-full"><X size={18} /></button>
 
-        <h2 className="text-5xl font-black italic uppercase text-white mb-10 tracking-tighter leading-none">
-          REGISTAR <span className="text-blue-600 text-6xl">.</span>
-        </h2>
+        <div className="mb-6 border-l-4 border-blue-600 pl-4">
+          <h2 className="text-2xl font-black italic uppercase text-white tracking-tighter">Registrar Unidade</h2>
+          <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Configuração Técnica</p>
+        </div>
 
-        <form onSubmit={(e) => { e.preventDefault(); onSubmit({ brand, model, plate, color, year: parseInt(year), fuel }); }} className="space-y-8">
+        <form onSubmit={(e) => { e.preventDefault(); onSubmit({ brand, model, plate, color, year: parseInt(year), fuel }); }} className="space-y-5">
           
           {/* PAÍS */}
           <div className="flex flex-wrap gap-2">
             {Object.keys(PLATE_STYLES).map((key) => (
               <button 
                 key={key} type="button" onClick={() => { setPlateType(key); setPlate(""); }}
-                className={`px-4 py-2 rounded-full text-[10px] font-black transition-all border ${plateType === key ? "bg-white text-black border-white" : "bg-white/5 border-white/5 text-slate-500"}`}
+                className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase transition-all border ${plateType === key ? "bg-white text-black border-white shadow-md shadow-white/20" : "bg-white/5 border-white/5 text-slate-500 hover:text-white"}`}
               >
                 {PLATE_STYLES[key].label}
               </button>
             ))}
           </div>
 
-          {/* MATRÍCULA INTERATIVA */}
-          <div className="flex justify-center py-8 bg-white/[0.02] rounded-[2.5rem] border border-white/5">
-            <div className={`relative flex ${style.bg} border-[3px] border-zinc-400 rounded-md shadow-2xl min-w-[320px] h-20 overflow-hidden`}>
+          {/* MATRÍCULA INTERATIVA (MUITO MAIS PEQUENA) */}
+          <div className="flex justify-center py-4 bg-white/[0.02] rounded-2xl border border-white/5">
+            <div className={`relative flex ${style.bg} border-2 border-zinc-400 rounded shadow-lg min-w-[200px] h-12 overflow-hidden`}>
               {style.hasEuro && (
-                <div className={`${style.bar} w-10 flex flex-col items-center justify-between py-2 text-white`}>
-                  <div className="grid grid-cols-2 gap-0.5 mt-1">
-                    {[...Array(12)].map((_, i) => <div key={i} className="w-0.5 h-0.5 bg-yellow-400 rounded-full" />)}
+                <div className={`${style.bar} w-6 flex flex-col items-center justify-between py-1 text-white`}>
+                  <div className="grid grid-cols-2 gap-[1px]">
+                    {[...Array(12)].map((_, i) => <div key={i} className="w-[1px] h-[1px] bg-yellow-400 rounded-full" />)}
                   </div>
-                  <span className="font-bold text-lg mb-1">{style.country}</span>
+                  <span className="font-black text-[8px] leading-none mb-0.5">{style.country}</span>
                 </div>
               )}
-              <div className="flex-1 flex items-center justify-center px-4">
+              <div className="flex-1 flex items-center justify-center px-2">
                 <input required value={formatPlateDisplay(plate, plateType)} onChange={handlePlateChange} placeholder="--- ---"
-                  className={`bg-transparent w-full text-center text-5xl font-mono font-bold ${style.textColor} outline-none tracking-tight placeholder:opacity-10`} 
+                  className={`bg-transparent w-full text-center text-2xl font-mono font-black tracking-tighter ${style.textColor} outline-none placeholder:opacity-10`} 
                 />
               </div>
-              {style.showYellow && <div className="w-3 bg-yellow-400 border-l border-black/5" />}
+              {style.showYellow && <div className="w-2 bg-yellow-400 border-l border-black/10" />}
             </div>
           </div>
 
-          {/* GRID TÉCNICO */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-[#14171c] p-5 rounded-2xl border border-white/5">
-              <p className="text-[9px] font-black text-blue-600 uppercase mb-2">Marca</p>
-              <select required className="bg-transparent w-full text-white outline-none font-bold text-sm uppercase"
+          {/* GRID TÉCNICO (COMPACTO) */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-[#14171c] px-3 py-2 rounded-xl border border-white/5 focus-within:border-blue-600 transition-colors">
+              <p className="text-[8px] font-black text-blue-500 uppercase">Marca</p>
+              <select required className="bg-transparent w-full text-white outline-none font-bold text-xs uppercase"
                 value={brand} onChange={(e) => { setBrand(e.target.value); setModel(""); setFuel(""); }}>
                 <option value="" className="bg-[#0d0f14]">Selecionar</option>
                 {carBrands.map((b: any) => <option key={String(b)} value={String(b)} className="bg-[#0d0f14]">{String(b)}</option>)}
               </select>
             </div>
 
-            <div className="bg-[#14171c] p-5 rounded-2xl border border-white/5">
-              <p className="text-[9px] font-black text-blue-600 uppercase mb-2">Modelo</p>
-              <select required disabled={!brand} className="bg-transparent w-full text-white outline-none font-bold text-sm uppercase disabled:opacity-20"
+            <div className="bg-[#14171c] px-3 py-2 rounded-xl border border-white/5 focus-within:border-blue-600 transition-colors">
+              <p className="text-[8px] font-black text-blue-500 uppercase">Modelo</p>
+              <select required disabled={!brand} className="bg-transparent w-full text-white outline-none font-bold text-xs uppercase disabled:opacity-30"
                 value={model} onChange={(e) => setModel(e.target.value)}>
                 <option value="" className="bg-[#0d0f14]">Selecionar</option>
                 {brandConfig?.models.map((m: string) => <option key={m} value={m} className="bg-[#0d0f14]">{m}</option>)}
               </select>
             </div>
 
-            <div className="bg-[#14171c] p-5 rounded-2xl border border-white/5 text-white">
-              <p className="text-[9px] font-black text-blue-600 uppercase mb-2">Ano</p>
+            <div className="bg-[#14171c] px-3 py-2 rounded-xl border border-white/5 focus-within:border-blue-600 transition-colors">
+              <p className="text-[8px] font-black text-blue-500 uppercase">Ano Fabrico</p>
               <input type="number" min={brandConfig?.startYear || 1980} max={2026} value={year} onChange={(e) => setYear(e.target.value)}
-                className="bg-transparent w-full text-white outline-none font-bold text-sm" />
+                className="bg-transparent w-full text-white outline-none font-bold text-xs" />
             </div>
 
-            <div className="bg-[#14171c] p-5 rounded-2xl border border-white/5">
-              <p className="text-[9px] font-black text-blue-600 uppercase mb-2">Motorização</p>
-              <select required disabled={!brand} className="bg-transparent w-full text-white outline-none font-bold text-sm uppercase"
+            <div className="bg-[#14171c] px-3 py-2 rounded-xl border border-white/5 focus-within:border-blue-600 transition-colors">
+              <p className="text-[8px] font-black text-blue-500 uppercase">Motor</p>
+              <select required disabled={!brand} className="bg-transparent w-full text-white outline-none font-bold text-xs uppercase disabled:opacity-30"
                 value={fuel} onChange={(e) => setFuel(e.target.value)}>
                 <option value="" className="bg-[#0d0f14]">Selecionar</option>
                 {brandConfig?.fuels.map((f: string) => <option key={f} value={f} className="bg-[#0d0f14]">{f}</option>)}
@@ -123,19 +124,18 @@ export default function AddVehicleModal({ isOpen, onClose, onSubmit, loading }: 
           </div>
 
           {/* CORES */}
-          <div className="bg-[#14171c] p-8 rounded-[2.5rem] border border-white/5">
-             <div className="flex flex-wrap justify-center gap-4">
+          <div className="bg-[#14171c] p-4 rounded-xl border border-white/5">
+             <div className="flex flex-wrap items-center justify-between gap-2">
               {carColors.map((c) => (
-                <button key={c.value} type="button" onClick={() => setColor(c.value)} className="group flex flex-col items-center gap-2">
-                  <div className={`w-8 h-8 rounded-full border-2 transition-all ${color === c.value ? "border-blue-600 scale-125 shadow-lg shadow-blue-600/30" : "border-white/10"}`}
-                    style={{ backgroundColor: c.hex }} />
-                </button>
+                <button key={c.value} type="button" onClick={() => setColor(c.value)} title={c.value}
+                  className={`w-5 h-5 rounded-full border-2 transition-all ${color === c.value ? "border-blue-600 scale-[1.4] shadow-md shadow-blue-600/30" : "border-white/10 opacity-70 hover:opacity-100 hover:scale-110"}`}
+                  style={{ backgroundColor: c.hex }} />
               ))}
             </div>
           </div>
 
-          <button disabled={loading} className="w-full bg-blue-600 hover:bg-white text-white hover:text-black p-6 font-black uppercase italic transition-all flex items-center justify-center gap-4 rounded-2xl active:scale-95 group">
-            {loading ? "A PROCESSAR..." : "CONFIRMAR REGISTO"} <ShieldCheck size={24} className="group-hover:rotate-12 transition-transform" />
+          <button disabled={loading} className="w-full bg-blue-600 hover:bg-white text-white hover:text-black py-4 rounded-xl font-black uppercase italic text-xs transition-all flex items-center justify-center gap-2 group shadow-[0_0_20px_rgba(37,99,235,0.4)]">
+            {loading ? "A PROCESSAR..." : "ADICIONAR UNIDADE"} <ShieldCheck size={16} className="group-hover:rotate-12 transition-transform" />
           </button>
         </form>
       </div>
