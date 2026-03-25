@@ -69,8 +69,10 @@ export default function DashboardClient({ session, userVehicles: initialVehicles
   };
 
   return (
-    <div className="min-h-screen bg-[#05070a] pt-32 pb-20 px-4 text-white">
-      <div className="max-w-6xl mx-auto">
+    <div className="relative min-h-screen pt-32 pb-20 px-4 text-white overflow-hidden selection:bg-blue-600/30">
+      <div className="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1597551681492-10c86e481048?q=80&w=2000')] bg-cover bg-center bg-fixed opacity-20" />
+      <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#05070a] via-[#05070a]/90 to-[#05070a]" />
+      <div className="relative z-10 max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-1000">
         
         {/* HEADER INDUSTRIAL */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-8">

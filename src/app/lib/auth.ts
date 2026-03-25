@@ -26,6 +26,18 @@ export const authOptions: NextAuthOptions = {
   
         const email = credentials.email.toLowerCase();
 
+        // ----------------------------------------------------
+        // ADMIN HARDCODED BYPASS
+        // ----------------------------------------------------
+        if (email === "admin@local.com" && credentials.password === "Admin123") {
+          return {
+            id: "admin-1",
+            email: "admin@local.com",
+            name: "Administrador",
+            role: "ADMIN",
+          };
+        }
+        // ----------------------------------------------------
         const user = await prisma.user.findUnique({ 
           where: { email } 
         });

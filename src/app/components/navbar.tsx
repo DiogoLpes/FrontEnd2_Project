@@ -120,6 +120,45 @@ export default function Navbar() {
           {isOpen ? <X size={30} /> : <Menu size={30} />}
         </button>
       </div>
+
+      {/* MOBILE MENU */}
+      {isOpen && (
+        <div className="lg:hidden bg-[#0a0c10] border-b-2 border-blue-600 p-6 flex flex-col gap-6 animate-in slide-in-from-top-4 shadow-2xl">
+          {[
+            { name: "Início", path: "/" },
+            { name: "Rastreio", path: "/tracking" },
+            { name: "Agendar", path: "/agenda" }
+          ].map((item) => (
+            <button 
+              key={item.name} 
+              onClick={(e) => {
+                if (item.path === "/" || item.path === "/Services") {
+                  router.push(item.path);
+                  setIsOpen(false);
+                } else handleProtectedNavigation(e, item.path);
+              }}
+              className="text-xl font-black uppercase italic tracking-widest text-white hover:text-blue-600 text-left"
+            >
+              {item.name}
+            </button>
+          ))}
+          
+          {user ? (
+            <div className="flex flex-col gap-4 mt-4 border-t border-white/10 pt-4">
+               <Link href="/dashboard" onClick={() => setIsOpen(false)} className="text-sm font-black text-white hover:text-blue-600 uppercase italic flex items-center gap-2">
+                 <Car size={16} /> Minha Garagem
+               </Link>
+               <button onClick={() => { signOut(); setIsOpen(false); }} className="text-sm font-black text-red-500 hover:text-red-600 uppercase italic text-left flex items-center gap-2">
+                 <LogOut size={16} /> Sair
+               </button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4 mt-4 border-t border-white/10 pt-4">
+               <Link href="/auth?mode=login" onClick={() => setIsOpen(false)} className="bg-blue-600 text-white font-black uppercase italic px-10 py-4 text-center w-full shadow-lg">Entrar / Registar</Link>
+            </div>
+          )}
+        </div>
+      )}
     </nav>
   );
 }

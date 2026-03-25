@@ -54,7 +54,8 @@ export default function AgendaClient({ userVehicles = [] }: { userVehicles: any[
           title: "PEDIDO REGISTADO!", 
           text: "O Armindo já foi notificado e vai analisar o seu pedido.",
           icon: "success", 
-          confirmButtonColor: "#2563eb",
+          showConfirmButton: false,
+          timer: 2000,
           background: "#0d0f14", color: "#fff"
         });
         window.location.href = "/tracking?plate=" + selectedPlate; 
@@ -67,8 +68,10 @@ export default function AgendaClient({ userVehicles = [] }: { userVehicles: any[
   };
 
   return (
-    <div className="min-h-screen bg-[#05070a] pt-24 pb-20 px-4 text-white">
-      <div className="max-w-4xl mx-auto">
+    <div className="relative min-h-screen pt-24 pb-20 px-4 text-white overflow-hidden selection:bg-blue-600/30">
+      <div className="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1530906358829-e84b2769270f?q=80&w=2000')] bg-cover bg-center bg-fixed opacity-10" />
+      <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#05070a] via-[#05070a]/95 to-[#05070a]" />
+      <div className="relative z-10 max-w-4xl mx-auto animate-in fade-in zoom-in-95 duration-1000">
         
         <div className="text-center mb-10">
           <h1 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-none">

@@ -18,8 +18,10 @@ export default function StatusClient({ bookings }: { bookings: any[] }) {
   const currentIdx = steps.findIndex(s => s.label === active.status);
 
   return (
-    <div className="min-h-screen bg-[#05070a] pt-28 pb-20 px-4 text-white font-sans selection:bg-blue-600">
-      <div className="max-w-3xl mx-auto">
+    <div className="relative min-h-screen pt-28 pb-20 px-4 text-white font-sans selection:bg-blue-600 overflow-hidden">
+      <div className="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=2000')] bg-cover bg-center bg-fixed opacity-20" />
+      <div className="absolute inset-0 z-0 bg-gradient-to-t from-[#05070a] via-[#05070a]/80 to-[#05070a]" />
+      <div className="relative z-10 max-w-3xl mx-auto animate-in fade-in slide-in-from-right-8 duration-700">
         
         {/* SELETOR DE MÚLTIPLAS VIATURAS */}
         {bookings.length > 1 && (
