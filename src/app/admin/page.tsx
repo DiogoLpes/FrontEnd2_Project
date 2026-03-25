@@ -49,45 +49,42 @@ export default async function AdminDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* GRÁFICO SHADCN (SIMULADO COM TAILWIND) */}
-        <Card className="lg:col-span-2 bg-white/[0.02] backdrop-blur-2xl border-white/10 shadow-2xl rounded-3xl overflow-hidden">
-          <CardHeader className="bg-black/20 border-b border-white/5 py-5">
-            <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-3 text-white">
-              <TrendingUp className="text-blue-500" size={18} /> Fluxo de Reparações Semanal
+        <Card className="lg:col-span-2 bg-[#09090b] border-white/10 shadow-none rounded-xl overflow-hidden">
+          <CardHeader className="border-b border-white/5 pb-4">
+            <CardTitle className="text-sm font-semibold tracking-tight text-slate-200">
+              Pedidos de Serviço (7 dias)
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-8">
-            <div className="h-[250px] flex items-end justify-between gap-4">
+          <CardContent className="pt-6">
+            <div className="h-[250px] flex items-end justify-between gap-2">
               {[50, 80, 40, 95, 70, 85, 30].map((h, i) => (
                 <div key={i} className="flex-1 group relative h-full flex items-end">
-                  <div className="absolute inset-0 bg-white/5 rounded-t-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <div style={{ height: `${h}%` }} className="bg-gradient-to-t from-blue-600/20 to-blue-500/40 border-t-2 border-blue-400 group-hover:from-blue-600/40 group-hover:to-blue-400/60 transition-all rounded-t-xl w-full z-10 shadow-[0_0_20px_rgba(59,130,246,0.2)]"></div>
+                  <div style={{ height: `${h}%` }} className="bg-white hover:bg-slate-200 transition-colors rounded-sm w-full z-10"></div>
                 </div>
               ))}
             </div>
-            <div className="flex justify-between mt-6 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+            <div className="flex justify-between mt-4 text-xs font-medium text-slate-500">
               <span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span><span>Dom</span>
             </div>
           </CardContent>
         </Card>
 
         {/* ÚLTIMAS ENTRADAS */}
-        <Card className="bg-white/[0.02] backdrop-blur-2xl border-white/10 shadow-2xl rounded-3xl overflow-hidden">
-          <CardHeader className="bg-black/20 border-b border-white/5 py-5">
-            <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-3 text-white">
-              <Clock className="text-blue-500" size={18} /> Últimos Registos
+        <Card className="bg-[#09090b] border-white/10 shadow-none rounded-xl overflow-hidden">
+          <CardHeader className="border-b border-white/5 pb-4">
+            <CardTitle className="text-sm font-semibold tracking-tight text-slate-200">
+              Últimas Atividades
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 p-6">
+          <CardContent className="space-y-4 pt-6">
             {servicos.slice(0, 5).map((s: any) => (
-              <div key={s.id} className="flex items-center justify-between group p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-blue-500/30 transition-colors">
+              <div key={s.id} className="flex items-center justify-between pb-4 border-b border-white/5 last:border-0 last:pb-0">
                 <div>
-                  <p className="text-sm font-black text-white uppercase tracking-tight">{s.vehicle?.plate}</p>
-                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">{s.type}</p>
+                  <p className="text-sm font-medium text-white">{s.vehicle?.plate || "S/ MATRÍCULA"}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{s.type}</p>
                 </div>
-                <div className={`text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider shadow-inner ${
-                  s.status === 'PENDENTE' ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' : 'bg-blue-500/10 text-blue-500 border border-blue-500/20'
-                }`}>
-                  {s.status}
+                <div className="text-xs font-medium text-slate-400">
+                  {s.status === 'PENDENTE' ? 'Aguardando' : 'Ativo'}
                 </div>
               </div>
             ))}
@@ -101,20 +98,22 @@ export default async function AdminDashboard() {
 
 function MetricCard({ title, value, icon, color, alert }: any) {
   const colors: any = {
-    blue: "border-blue-500/30 text-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.15)]",
-    amber: "border-amber-500/30 text-amber-500 shadow-[0_0_30px_rgba(245,158,11,0.15)]",
-    emerald: "border-emerald-500/30 text-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.15)]",
+    blue: "text-slate-400",
+    amber: "text-amber-500",
+    emerald: "text-slate-400",
   };
   
   return (
-    <div className={`bg-white/[0.02] backdrop-blur-3xl border ${alert ? 'border-amber-500/50 animate-pulse' : 'border-white/10'} p-8 rounded-[2rem] relative overflow-hidden group hover:bg-white/[0.04] transition-all`}>
-      <div className={`absolute -right-6 -top-6 opacity-[0.07] group-hover:scale-125 transition-transform duration-700 ${colors[color]}`}>
-        {React.cloneElement(icon, { size: 120 })}
+    <div className={`bg-[#09090b] border ${alert ? 'border-amber-500/50' : 'border-white/10'} p-6 rounded-xl hover:bg-[#101013] transition-colors`}>
+      <div className="flex justify-between items-start mb-2">
+        <p className="text-sm font-medium text-slate-400">{title}</p>
+        <div className={colors[color]}>
+          {React.cloneElement(icon, { size: 16 })}
+        </div>
       </div>
-      <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-2">{title}</p>
-      <div className="flex items-baseline gap-3 relative z-10">
-        <h2 className={`text-6xl font-black italic tracking-tighter ${alert ? 'text-amber-500' : 'text-white'}`}>{value}</h2>
-        {alert && <span className="text-[9px] px-2 py-1 bg-amber-500/20 rounded border border-amber-500/30 font-black text-amber-500 uppercase tracking-widest">Ação Necessária</span>}
+      <div className="flex items-baseline gap-2">
+        <h2 className={`text-2xl font-bold ${alert ? 'text-amber-500' : 'text-white'}`}>{value}</h2>
+        {alert && <span className="text-[10px] px-1.5 py-0.5 bg-amber-500/10 rounded text-amber-500 font-semibold uppercase tracking-wider">Atenção</span>}
       </div>
     </div>
   );

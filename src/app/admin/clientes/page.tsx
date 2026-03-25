@@ -27,77 +27,73 @@ export default async function ClientesAdminPage() {
   });
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
+    <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
       {/* CABEÇALHO DA SECÇÃO */}
-      <div>
-        <h1 className="text-4xl font-black uppercase italic tracking-tighter text-white my-4">
-          Base de <span className="text-blue-600">Clientes</span>
-        </h1>
-        <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest">Controlo de dados de proprietários e as suas frotas.</p>
+      <div className="border-b border-white/10 pb-4">
+        <h1 className="text-3xl font-bold tracking-tight text-white mb-2">Clientes</h1>
+        <p className="text-sm text-slate-500">Gestão da base de dados de proprietários e suas frotas.</p>
       </div>
 
       {/* BARRA DE FERRAMENTAS */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex flex-1 items-center bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl px-4 py-2 w-full md:max-w-md shadow-inner transition-all focus-within:border-blue-500/50 focus-within:bg-white/[0.05]">
-          <Search size={18} className="text-blue-500" />
+        <div className="flex flex-1 items-center bg-[#09090b] border border-white/10 rounded-md px-3 py-1 w-full md:max-w-md focus-within:border-blue-500/50 focus-within:ring-1 focus-within:ring-blue-500/50 transition-all">
+          <Search size={16} className="text-slate-500" />
           <input 
             type="text" 
-            placeholder="Procurar condutor..." 
-            className="bg-transparent border-none outline-none py-2 px-3 w-full text-sm text-white font-bold uppercase"
+            placeholder="Procurar cliente..." 
+            className="bg-transparent border-none outline-none py-1.5 px-3 w-full text-sm text-slate-200"
           />
         </div>
-        <button className="bg-white text-black px-6 py-4 rounded-xl text-[10px] uppercase font-black italic tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-lg w-full md:w-auto">
+        <button className="bg-white text-black px-4 py-2 rounded-md text-sm font-medium hover:bg-slate-200 transition-colors w-full md:w-auto">
           Exportar Lista CSV
         </button>
       </div>
 
       {/* TABELA DE CLIENTES PREMIUM */}
-      <div className="rounded-[2.5rem] border border-white/10 bg-white/[0.01] backdrop-blur-2xl shadow-2xl overflow-hidden relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none" />
-        
-        <div className="overflow-x-auto relative z-10">
+      <div className="rounded-lg border border-white/10 bg-[#09090b] overflow-hidden">
+        <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
-              <tr className="border-b border-white/5 bg-black/40 text-blue-500/80 text-[10px] font-black uppercase tracking-[0.3em]">
-                <th className="p-6">Identificação Condutor</th>
-                <th className="p-6">Contacto (Email)</th>
-                <th className="p-6 text-center">Gestão Frotas</th>
-                <th className="p-6 text-center">Visitas Oficina</th>
-                <th className="p-6 text-right">Ações</th>
+              <tr className="border-b border-white/10 bg-[#101013] text-slate-400 text-xs font-semibold tracking-wide">
+                <th className="px-6 py-4">Identificação</th>
+                <th className="px-6 py-4">Contacto</th>
+                <th className="px-6 py-4 text-center">Frotas</th>
+                <th className="px-6 py-4 text-center">Serviços</th>
+                <th className="px-6 py-4 text-right">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {clientes.map((cliente: any) => (
-                <tr key={cliente.id} className="hover:bg-blue-600/5 transition-colors group cursor-default">
-                  <td className="p-6">
-                    <div className="flex items-center gap-4">
-                      <div className="h-12 w-12 rounded-2xl bg-black/50 border border-white/10 group-hover:border-blue-500/30 flex items-center justify-center text-white font-black text-lg uppercase italic shadow-inner transition-all">
-                        {cliente.name?.substring(0, 2) || 'UK'}
+                <tr key={cliente.id} className="hover:bg-[#101013] transition-colors">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-9 w-9 rounded-full bg-blue-600/10 text-blue-500 flex items-center justify-center text-sm font-semibold">
+                        {cliente.name?.substring(0, 2)?.toUpperCase() || 'U'}
                       </div>
                       <div>
-                        <p className="text-sm font-black text-white uppercase tracking-tight">{cliente.name || "Condutor Desconhecido"}</p>
-                        <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-1 font-bold">UID: {String(cliente.id).substring(0, 8)}</p>
+                        <p className="text-sm font-medium text-slate-200">{cliente.name || "Sem Nome"}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">ID: {String(cliente.id).substring(0, 8)}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="p-6 text-sm text-slate-400 font-bold">
+                  <td className="px-6 py-4 text-sm text-slate-400">
                     <div className="flex items-center gap-2">
-                      <Mail size={16} className="text-blue-500/50" />
+                      <Mail size={14} className="text-slate-500" />
                       {cliente.email}
                     </div>
                   </td>
-                  <td className="p-6 text-center">
-                    <span className="inline-flex items-center gap-2 bg-black/40 px-4 py-2 rounded-xl text-xs font-black italic text-white border border-white/5 group-hover:border-white/20 transition-all shadow-inner">
-                      <Car size={14} className="text-blue-500" />
-                      {cliente.vehicles?.length || 0} UNI.
+                  <td className="px-6 py-4 text-center">
+                    <span className="inline-flex items-center gap-1.5 bg-slate-800/50 px-2.5 py-1 rounded-md text-xs font-medium text-slate-300">
+                      <Car size={12} />
+                      {cliente.vehicles?.length || 0}
                     </span>
                   </td>
-                  <td className="p-6 text-center text-sm font-black italic text-blue-500 tracking-tighter text-xl">
+                  <td className="px-6 py-4 text-center text-sm font-medium text-slate-300">
                     {cliente.vehicles?.reduce((acc: number, v: any) => acc + (v.services?.length || 0), 0) || 0}
                   </td>
-                  <td className="p-6 text-right">
-                    <button className="text-slate-500 hover:text-white p-3 hover:bg-white/5 rounded-xl transition-all">
-                      <MoreHorizontal size={20} />
+                  <td className="px-6 py-4 text-right">
+                    <button className="text-slate-500 hover:text-slate-300 p-2 rounded-md hover:bg-slate-800 transition-colors">
+                      <MoreHorizontal size={16} />
                     </button>
                   </td>
                 </tr>
@@ -107,9 +103,9 @@ export default async function ClientesAdminPage() {
         </div>
         
         {clientes.length === 0 && (
-          <div className="p-24 text-center">
-            <User size={48} className="mx-auto text-white/10 mb-4" />
-            <p className="text-slate-500 text-sm font-bold uppercase tracking-widest">
+          <div className="p-20 text-center">
+            <User size={32} className="mx-auto text-slate-700 mb-3" />
+            <p className="text-slate-500 text-sm font-medium">
               Nenhum motorista registado na base de dados.
             </p>
           </div>

@@ -26,7 +26,7 @@ interface ServiceEntry {
     plate: string;
     brand: string;
     model: string;
-    owner?: {
+    user?: {
       name: string;
       phone: string;
     }
@@ -55,33 +55,30 @@ export default function AdminAgendamentos() {
 
   const handleDarOrcamento = async (serviceId: number) => {
     const { value: formValues } = await Swal.fire({
-      title: '<span class="text-white font-black italic uppercase tracking-tighter text-3xl">Proposta de Serviço</span>',
-      background: "rgba(10, 12, 16, 0.95)",
-      color: "#fff",
+      title: '<h3 class="text-xl font-semibold text-white">Proposta de Serviço</h3>',
+      background: "#09090b",
+      color: "#f8fafc",
       customClass: {
-        popup: 'border border-blue-500/20 rounded-[2.5rem] shadow-[0_30px_100px_rgba(0,0,0,0.9)] backdrop-blur-3xl p-6',
-        confirmButton: 'rounded-xl uppercase font-black italic text-xs tracking-widest hover:scale-105 transition-transform'
+        popup: 'border border-slate-800 rounded-lg p-4',
+        confirmButton: 'bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 w-full py-2.5 mt-2',
+        cancelButton: 'text-slate-400 hover:text-white rounded-md text-sm font-medium hover:bg-slate-800 w-full py-2.5 mt-2'
       },
       html: `
-        <div class="flex flex-col gap-5 p-2 text-left mt-4">
-          <div class="bg-white/[0.02] p-5 rounded-2xl border border-white/5">
-            <label class="text-[9px] font-black uppercase text-blue-500 tracking-[0.3em] mb-3 block">Orçamento Final (€)</label>
-            <div class="relative">
-              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 font-black text-xl">€</span>
-              <input id="swal-price" type="number" step="0.01" class="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white text-3xl font-black italic tracking-tighter focus:border-blue-500 focus:bg-black/60 outline-none transition-all shadow-inner" placeholder="0.00">
-            </div>
+        <div class="flex flex-col gap-4 text-left mt-2">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-sm font-medium text-slate-400">Orçamento Final (€)</label>
+            <input id="swal-price" type="number" step="0.01" class="flex h-10 w-full rounded-md border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" placeholder="0.00">
           </div>
-          <div class="bg-white/[0.02] p-5 rounded-2xl border border-white/5">
-            <label class="text-[9px] font-black uppercase text-blue-500 tracking-[0.3em] mb-3 block">Agendamento (Data / Hora)</label>
-            <input id="swal-date" type="datetime-local" class="w-full bg-black/40 border border-white/10 rounded-xl py-3 px-4 text-white text-sm font-bold uppercase tracking-wider focus:border-blue-500 focus:bg-black/60 outline-none transition-all shadow-inner">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-sm font-medium text-slate-400">Agendamento (Data / Hora)</label>
+            <input id="swal-date" type="datetime-local" class="flex h-10 w-full rounded-md border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none">
           </div>
         </div>
       `,
       showCancelButton: true,
-      confirmButtonText: 'APROVAR & NOTIFICAR CLIENTE',
-      confirmButtonColor: '#2563eb',
+      confirmButtonText: 'APROVAR ORÇAMENTO',
       cancelButtonText: 'CANCELAR',
-      cancelButtonColor: 'transparent',
+      buttonsStyling: false,
       preConfirm: () => {
         const price = (document.getElementById('swal-price') as HTMLInputElement).value;
         const date = (document.getElementById('swal-date') as HTMLInputElement).value;
@@ -154,7 +151,7 @@ export default function AdminAgendamentos() {
         <h1 style="text-transform: uppercase; font-style: italic; border-bottom: 2px solid #000; padding-bottom: 10px;">TS PNEUS - Guia de Oficina</h1>
         <div style="display: flex; justify-content: space-between; margin-top: 30px;">
           <div>
-            <p><strong>CLIENTE:</strong> ${s.vehicle?.owner?.name || 'N/D'}</p>
+            <p><strong>CLIENTE:</strong> ${s.vehicle?.user?.name || 'Desconhecido'}</p>
             <p><strong>VIATURA:</strong> ${s.vehicle?.brand} ${s.vehicle?.model}</p>
             <p><strong>MATRÍCULA:</strong> ${s.vehicle?.plate}</p>
             <p><strong>VALOR:</strong> ${s.price ? s.price + '€' : 'A definir'}</p>
@@ -180,101 +177,95 @@ export default function AdminAgendamentos() {
   };
 
   return (
-    <div className="p-4 md:p-8 pt-24 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 relative z-10">
+    <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
       
       {/* HEADER */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-4">
         <div>
-          <h1 className="text-5xl md:text-6xl font-black uppercase italic text-white tracking-tighter">
-            Tracking de <span className="text-blue-600">Serviços</span>
-          </h1>
-          <p className="text-blue-500 text-[10px] font-black uppercase tracking-[0.4em] mt-2">Painel de Controlo da Oficina</p>
+          <h1 className="text-3xl font-bold tracking-tight text-white mb-2">Pedidos de Serviço</h1>
+          <p className="text-sm text-slate-500">Tracking e Agendamento de intervenções técnicas.</p>
         </div>
       </div>
 
       {/* LISTAGEM */}
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 gap-4">
         {loading ? (
-          <div className="text-center p-20 text-blue-600 animate-pulse font-black uppercase italic tracking-widest text-lg">A sincronizar com a base de dados...</div>
+          <div className="text-center p-20 text-blue-500 text-sm font-medium">Extraindo dados...</div>
         ) : (
           services.map((s: ServiceEntry) => (
-            <div key={s.id} className="bg-white/[0.02] backdrop-blur-2xl border border-white/10 p-6 md:p-8 rounded-3xl flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 hover:bg-white/[0.04] transition-all duration-300 group relative overflow-hidden shadow-2xl">
+            <div key={s.id} className="bg-[#09090b] border border-white/10 p-5 rounded-lg flex flex-col xl:flex-row justify-between xl:items-center gap-6 hover:bg-[#101013] transition-colors relative">
               
-              <div className={`absolute left-0 top-0 h-full w-2 transition-colors ${
-                s.status === 'PENDENTE' || s.status === 'SOLICITADO' ? 'bg-white/40 shadow-[0_0_15px_rgba(255,255,255,0.3)]' : 
-                s.status === 'ORCAMENTADO' ? 'bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.5)]' : 
-                s.status === 'EM_REPARACAO' ? 'bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.5)]' : 'bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.5)]'
+              <div className={`absolute left-0 top-0 h-full w-1 rounded-l-lg ${
+                s.status === 'PENDENTE' || s.status === 'SOLICITADO' ? 'bg-slate-600' : 
+                s.status === 'ORCAMENTADO' ? 'bg-amber-500' : 
+                s.status === 'EM_REPARACAO' ? 'bg-blue-500' : 'bg-emerald-500'
               }`}></div>
 
-              <div className="flex gap-6 flex-1 text-white ml-2">
-                <div className={`w-16 h-16 flex-shrink-0 rounded-2xl flex items-center justify-center border transition-colors shadow-inner ${
-                  s.status === 'PENDENTE' || s.status === 'SOLICITADO' ? 'bg-white/5 border-white/20 text-white' :
-                  s.status === 'ORCAMENTADO' ? 'bg-orange-500/10 border-orange-500/30 text-orange-500' : 
-                  s.status === 'EM_REPARACAO' ? 'bg-blue-500/10 border-blue-500/30 text-blue-500' : 
-                  'bg-green-500/10 border-green-500/30 text-green-500'
-                }`}>
-                  <Car size={32} />
+              <div className="flex gap-4 flex-1 text-white ml-2">
+                <div className="w-12 h-12 flex-shrink-0 rounded-md flex items-center justify-center bg-slate-900 border border-slate-800 text-slate-400">
+                  <Car size={24} />
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-white font-black uppercase italic text-base tracking-tighter">
+                    <span className="text-white font-semibold text-lg">
                       {s.vehicle?.brand} {s.vehicle?.model}
                     </span>
-                    <span className="bg-blue-600 px-2 py-0.5 text-white font-mono text-[10px] font-bold">
+                    <span className="bg-slate-800 border border-slate-700 px-2 py-0.5 text-slate-300 font-mono text-xs rounded-md">
                       {s.vehicle?.plate}
                     </span>
                   </div>
-                  <div className="mt-4 bg-black/40 backdrop-blur-md border border-white/5 rounded-2xl p-4 shadow-inner">
-                    <p className="text-blue-500 text-[10px] font-black uppercase tracking-widest mb-1.5 flex items-center gap-2">
-                      <User size={14} /> Detalhes do Condutor: <span className="text-white text-xs">{s.vehicle?.owner?.name || "Desconhecido"}</span>
+                  <div className="mt-3">
+                    <p className="text-slate-400 text-xs font-medium flex items-center gap-1.5">
+                      <User size={14} className="text-slate-500" /> 
+                      Proprietário: <span className="text-white">{s.vehicle?.user?.name || "Desconhecido"}</span>
                     </p>
-                    <p className="text-slate-300 text-[11px] font-bold uppercase italic leading-relaxed tracking-wider border-l-2 border-white/10 pl-3 mt-3">
-                      {s.description ? `"${s.description}"` : "Nenhum reporte adicional assinalado."}
+                    <p className="text-slate-500 text-xs italic mt-1.5 line-clamp-2">
+                      {s.description ? `"${s.description}"` : "Sem descrição remetida."}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-col lg:items-end min-w-[150px] bg-black/20 p-4 rounded-2xl border border-white/5">
-                  <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest flex items-center gap-1.5 mb-1">
-                    <Wrench size={12} /> {s.type}
+              <div className="flex flex-col xl:items-end min-w-[150px]">
+                  <span className="text-xs font-medium text-blue-500 uppercase tracking-wider flex items-baseline gap-1.5 mb-1">
+                    <Wrench size={10} /> {s.type}
                   </span>
                   {s.price ? (
-                    <div className="flex items-center gap-1 text-white font-black text-3xl italic tracking-tighter">
+                    <div className="flex items-center gap-1 text-white font-bold text-2xl">
                        {Number(s.price).toFixed(2)}€
                     </div>
                   ) : (
-                    <div className="flex items-center gap-1 text-slate-500 font-black text-xs uppercase tracking-widest mt-1">
-                       A AGUARDAR ORÇAMENTO
+                    <div className="flex items-center mt-2">
+                       <span className="text-slate-500 text-[10px] font-medium uppercase bg-slate-800/50 px-2 py-1 rounded inline-block">Aguardando Avaliação</span>
                     </div>
                   )}
               </div>
 
-              <div className="flex items-center gap-3 w-full lg:w-80">
+              <div className="flex items-center gap-3 w-full xl:w-72">
                 <div className="flex-1">
                   {s.status === 'PENDENTE' || s.status === 'SOLICITADO' ? (
                     <button 
                       onClick={() => handleDarOrcamento(s.id)}
-                      className="w-full bg-blue-600 hover:bg-white text-white hover:text-black rounded-xl text-[10px] font-black uppercase py-4 px-3 transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_20px_rgba(255,255,255,0.4)]"
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-md text-xs font-medium py-2 px-3 transition-colors flex items-center justify-center gap-2"
                     >
-                      <Euro size={16} /> Dar Orçamento Formal
+                      <Euro size={14} /> Elaborar Orçamento
                     </button>
                   ) : (
                     <div className="relative">
                       <select 
                         value={s.status}
                         onChange={(e) => updateStatus(s.id, e.target.value)}
-                        className="w-full bg-black/60 border border-white/10 rounded-xl text-[10px] font-black uppercase py-4 px-4 outline-none cursor-pointer appearance-none text-white focus:border-blue-500 transition-colors"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-md text-xs font-medium py-2.5 px-3 outline-none cursor-pointer appearance-none text-slate-200 focus:border-blue-600 hover:border-slate-700 transition-all"
                       >
-                        <option value="ORCAMENTADO">ORÇAMENTADO</option>
-                        <option value="EM_REPARACAO">EM REPARAÇÃO</option>
-                        <option value="CONCLUIDO">CONCLUÍDO</option>
+                        <option value="ORCAMENTADO">Orçamentado</option>
+                        <option value="EM_REPARACAO">Em Reparação</option>
+                        <option value="CONCLUIDO">Concluído</option>
                       </select>
                     </div>
                   )}
                 </div>
-                <button onClick={() => handlePrint(s)} className="p-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl transition-colors shadow-inner" title="Imprimir Ficha Técnica">
-                  <Printer size={18} />
+                <button onClick={() => handlePrint(s)} className="p-2 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white rounded-md transition-colors" title="Imprimir OS">
+                  <Printer size={16} />
                 </button>
               </div>
 

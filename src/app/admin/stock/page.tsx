@@ -42,12 +42,15 @@ export default function StockPage() {
 
       if (res.ok) {
         Swal.fire({ 
-            title: "REGISTADO", 
-            text: "Peça inserida no sistema com sucesso.", 
-            icon: "success", 
-            background: "#0d1117", 
-            color: "#fff",
-            confirmButtonColor: "#2563eb"
+            title: '<h3 class="text-xl font-semibold text-white">Item Registado</h3>', 
+            html: '<p class="text-sm text-slate-400">A nova peça foi adicionada ao inventário.</p>', 
+            background: "#09090b",
+            color: "#f8fafc",
+            customClass: {
+              popup: 'border border-slate-800 rounded-lg p-4',
+              confirmButton: 'bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 w-full py-2.5 mt-2'
+            },
+            buttonsStyling: false
         });
         (e.target as HTMLFormElement).reset();
         fetchProducts();
@@ -65,62 +68,63 @@ export default function StockPage() {
   const lowStockCount = products.filter((p: any) => p.quantity <= p.minStock).length;
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
+    <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
       
       {/* HEADER & ESTATÍSTICAS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-[#0d1117] border border-white/5 p-6 rounded-sm flex items-center gap-4 shadow-xl">
-          <div className="p-3 bg-blue-600/10 rounded-full text-blue-500"><Package size={24} /></div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-[#09090b] border border-white/10 p-6 rounded-lg flex items-center gap-4">
+          <div className="p-3 bg-slate-900 border border-slate-800 rounded-md text-slate-400"><Package size={20} /></div>
           <div>
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Total de Itens</p>
-            <p className="text-2xl font-black text-white italic tracking-tighter">{totalItems}</p>
+            <p className="text-xs font-medium text-slate-500">Total de Itens</p>
+            <p className="text-2xl font-bold text-white">{totalItems}</p>
           </div>
         </div>
-        <div className="bg-[#0d1117] border border-white/5 p-6 rounded-sm flex items-center gap-4 shadow-xl">
-          <div className="p-3 bg-green-600/10 rounded-full text-green-500"><TrendingUp size={24} /></div>
+        <div className="bg-[#09090b] border border-white/10 p-6 rounded-lg flex items-center gap-4">
+          <div className="p-3 bg-slate-900 border border-slate-800 rounded-md text-slate-400"><DollarSign size={20} /></div>
           <div>
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Valor em Stock</p>
-            <p className="text-2xl font-black text-white italic tracking-tighter">{totalValue.toFixed(2)}€</p>
+            <p className="text-xs font-medium text-slate-500">Valor em Stock</p>
+            <p className="text-2xl font-bold text-white">{totalValue.toFixed(2)}€</p>
           </div>
         </div>
-        <div className="bg-[#0d1117] border border-white/5 p-6 rounded-sm flex items-center gap-4 shadow-xl border-l-orange-500/50">
-          <div className="p-3 bg-orange-600/10 rounded-full text-orange-500"><AlertCircle size={24} /></div>
+        <div className={`bg-[#09090b] border ${lowStockCount > 0 ? 'border-amber-500/50' : 'border-white/10'} p-6 rounded-lg flex items-center gap-4`}>
+          <div className={`p-3 rounded-md border ${lowStockCount > 0 ? 'bg-amber-500/10 border-amber-500/20 text-amber-500' : 'bg-slate-900 border-slate-800 text-slate-400'}`}>
+            <AlertCircle size={20} />
+          </div>
           <div>
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Reposição Crítica</p>
-            <p className="text-2xl font-black text-orange-500 italic tracking-tighter">{lowStockCount} Alertas</p>
+            <p className="text-xs font-medium text-slate-500">Reposição Crítica</p>
+            <p className={`text-2xl font-bold ${lowStockCount > 0 ? 'text-amber-500' : 'text-white'}`}>{lowStockCount} Alertas</p>
           </div>
         </div>
       </div>
 
       {/* FORMULÁRIO DE ENTRADA */}
-      <div className="bg-[#0d1117] border border-white/5 p-6 rounded-sm shadow-2xl relative overflow-hidden group">
-        <div className="absolute top-0 left-0 w-1 h-full bg-blue-600 group-hover:w-1.5 transition-all"></div>
-        <h2 className="text-white font-black italic uppercase text-sm mb-6 flex items-center gap-2 tracking-tighter">
-          <Plus size={16} className="text-blue-600" /> Nova Entrada de Material
+      <div className="bg-[#09090b] border border-white/10 p-6 rounded-lg relative overflow-hidden">
+        <h2 className="text-white font-semibold text-sm mb-5 flex items-center gap-2">
+          <Plus size={16} className="text-slate-400" /> Nova Entrada de Material
         </h2>
         
         <form onSubmit={handleAddProduct} className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="space-y-1">
-            <label className="text-[9px] font-black text-blue-600 uppercase">Descrição da Peça</label>
-            <input name="name" placeholder="Ex: Pastilhas Travão" required className="w-full bg-[#161b22] border border-white/10 p-3 text-white text-xs outline-none focus:border-blue-600 transition-all placeholder:text-slate-700" />
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-slate-400">Descrição da Peça</label>
+            <input name="name" placeholder="Ex: Pastilhas Travão" required className="flex h-10 w-full rounded-md border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-500 transition-colors" />
           </div>
-          <div className="space-y-1">
-            <label className="text-[9px] font-black text-blue-600 uppercase">Categoria</label>
-            <input name="category" placeholder="Ex: Travões" required className="w-full bg-[#161b22] border border-white/10 p-3 text-white text-xs outline-none focus:border-blue-600 transition-all placeholder:text-slate-700" />
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-slate-400">Categoria</label>
+            <input name="category" placeholder="Ex: Travões" required className="flex h-10 w-full rounded-md border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-500 transition-colors" />
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="space-y-1">
-              <label className="text-[9px] font-black text-blue-600 uppercase">Quantidade</label>
-              <input name="quantity" type="number" placeholder="0" required className="w-full bg-[#161b22] border border-white/10 p-3 text-white text-xs outline-none focus:border-blue-600 transition-all" />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-slate-400">Quantidade</label>
+              <input name="quantity" type="number" placeholder="0" required className="flex h-10 w-full rounded-md border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-500 transition-colors" />
             </div>
-            <div className="space-y-1">
-              <label className="text-[9px] font-black text-blue-600 uppercase">Preço (€)</label>
-              <input name="price" type="number" step="0.01" placeholder="0.00" required className="w-full bg-[#161b22] border border-white/10 p-3 text-white text-xs outline-none focus:border-blue-600 transition-all" />
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-slate-400">Preço (€)</label>
+              <input name="price" type="number" step="0.01" placeholder="0.00" required className="flex h-10 w-full rounded-md border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-500 transition-colors" />
             </div>
           </div>
           <div className="flex items-end">
-            <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white font-black uppercase italic text-xs p-3 hover:bg-white hover:text-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-600/10">
-              {loading ? "A PROCESSAR..." : "REGISTAR PEÇA"}
+            <button type="submit" disabled={loading} className="h-10 w-full bg-blue-600 text-white font-medium text-sm rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center disabled:opacity-50">
+              {loading ? "A processar..." : "Registar Peça"}
             </button>
           </div>
           <input name="minStock" type="hidden" defaultValue="5" />
@@ -128,50 +132,47 @@ export default function StockPage() {
       </div>
 
       {/* TABELA DE INVENTÁRIO */}
-      <div className="bg-[#0d1117] border border-white/5 rounded-sm overflow-hidden shadow-2xl">
-        <div className="bg-[#161b22] p-4 border-b border-white/5">
-          <h3 className="text-white font-black uppercase italic text-xs flex items-center gap-2">
-            <TrendingUp size={14} className="text-blue-600" /> Inventário Atualizado
-          </h3>
+      <div className="bg-[#09090b] border border-white/10 rounded-lg overflow-hidden">
+        <div className="bg-[#101013] px-6 py-4 border-b border-white/10 flex items-center gap-2">
+           <Package size={16} className="text-slate-400" />
+           <h3 className="text-slate-200 font-semibold text-sm">Inventário</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-black/20 text-slate-500 uppercase font-black text-[10px] tracking-widest">
-                <th className="p-5">Informação do Item</th>
-                <th className="p-5">Categoria</th>
-                <th className="p-5">Quantidade</th>
-                <th className="p-5">Preço Unit.</th>
-                <th className="p-5 text-right">Ação</th>
+              <tr className="bg-[#09090b] text-slate-500 text-xs font-medium border-b border-white/10">
+                <th className="px-6 py-4">Artigo</th>
+                <th className="px-6 py-4">Categoria</th>
+                <th className="px-6 py-4">Quantidade</th>
+                <th className="px-6 py-4">Preço (Un.)</th>
+                <th className="px-6 py-4 text-right">Ação</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5 text-slate-300">
+            <tbody className="divide-y divide-white/10">
               {products.map((p: any) => (
-                <tr key={p.id} className="hover:bg-white/[0.02] transition-colors group">
-                  <td className="p-5">
+                <tr key={p.id} className="hover:bg-[#101013] transition-colors">
+                  <td className="px-6 py-4">
                     <div className="flex flex-col">
-                      <span className="text-white font-bold text-xs uppercase group-hover:text-blue-500 transition-colors">{p.name}</span>
-                      <span className="text-[9px] text-slate-600 font-mono tracking-tighter">SKU-{p.id.toString().padStart(5, '0')}</span>
+                      <span className="text-white font-medium text-sm">{p.name}</span>
+                      <span className="text-xs text-slate-500 font-mono mt-0.5">SKU-{p.id.toString().padStart(5, '0')}</span>
                     </div>
                   </td>
-                  <td className="p-5">
-                    <span className="bg-white/5 text-slate-400 text-[9px] px-2 py-1 font-black uppercase border border-white/5">
+                  <td className="px-6 py-4 text-sm text-slate-400">
                       {p.category}
-                    </span>
                   </td>
-                  <td className="p-5">
+                  <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                      <span className={`text-xs font-black ${p.quantity <= p.minStock ? "text-orange-500 animate-pulse" : "text-white"}`}>
-                        {p.quantity} UN
+                      <span className={`text-sm font-medium ${p.quantity <= p.minStock ? "text-amber-500" : "text-white"}`}>
+                        {p.quantity} Un.
                       </span>
-                      {p.quantity <= p.minStock && <AlertCircle size={12} className="text-orange-500" />}
+                      {p.quantity <= p.minStock && <AlertCircle size={14} className="text-amber-500" />}
                     </div>
                   </td>
-                  <td className="p-5">
-                    <span className="font-mono text-blue-400 text-xs font-bold">{Number(p.price).toFixed(2)}€</span>
+                  <td className="px-6 py-4">
+                    <span className="text-sm font-medium text-slate-300">{Number(p.price).toFixed(2)}€</span>
                   </td>
-                  <td className="p-5 text-right">
-                    <button className="p-2 hover:bg-red-500/20 text-slate-600 hover:text-red-500 transition-all rounded-sm">
+                  <td className="px-6 py-4 text-right">
+                    <button className="p-2 hover:bg-slate-800 text-slate-500 hover:text-red-400 transition-colors rounded-md">
                       <Trash2 size={16} />
                     </button>
                   </td>
@@ -179,8 +180,8 @@ export default function StockPage() {
               ))}
               {products.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="p-12 text-center text-slate-600 italic font-black text-xs uppercase tracking-widest">
-                    Sem registos no inventário
+                  <td colSpan={5} className="py-12 text-center text-slate-500 text-sm">
+                    Sem registos no inventário.
                   </td>
                 </tr>
               )}

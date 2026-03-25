@@ -17,15 +17,10 @@ export default function Navbar() {
 
   const user = session?.user;
   const firstName = user?.name?.split(" ")[0] || "Cliente";
-  const isAdmin = user?.email?.toLowerCase() === "admin@local.com";
 
-  // DEFINIR LINKS DEPENDENDO SE É ADMIN
-  const navLinks = isAdmin ? [
-    { name: "Painel Admin", path: "/admin" },
-    { name: "Lista de Agendamentos", path: "/admin/agendamentos" },
-    { name: "Base de Clientes", path: "/admin/clientes" },
-    { name: "Ver Site Público", path: "/" }
-  ] : [
+  if (pathname?.startsWith("/admin")) return null;
+
+  const navLinks = [
     { name: "Início", path: "/" },
     { name: "Rastreio", path: "/tracking" },
     { name: "Agendar", path: "/agenda" }
@@ -80,7 +75,7 @@ export default function Navbar() {
             <button 
               key={item.name} 
               onClick={(e) => {
-                if (isAdmin || item.path === "/" || item.path === "/Services") {
+                if (item.path === "/" || item.path === "/Services") {
                   router.push(item.path);
                 } else {
                   handleProtectedNavigation(e, item.path);
@@ -148,7 +143,7 @@ export default function Navbar() {
             <button 
               key={item.name} 
               onClick={(e) => {
-                if (isAdmin || item.path === "/" || item.path === "/Services") {
+                if (item.path === "/" || item.path === "/Services") {
                   router.push(item.path);
                   setIsOpen(false);
                 } else {
