@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { X, ShieldCheck, Fuel, Calendar, Globe } from "lucide-react";
-import { carBrandsData, carColors, carBrands } from "../../lib/cardata"; 
+import { useState, useEffect } from "react";
+import { X, ShieldCheck } from "lucide-react";
+import { carColors } from "../../lib/cardata"; 
 
 const PLATE_STYLES: Record<string, any> = {
   PT: { label: "PT", country: "P", bg: "bg-white", bar: "bg-[#003399]", textColor: "text-black", hasEuro: true, showYellow: true },
@@ -21,8 +21,51 @@ export default function AddVehicleModal({ isOpen, onClose, onSubmit, loading }: 
   const [fuel, setFuel] = useState("");
   const [year, setYear] = useState(new Date().getFullYear().toString());
 
-  const brandConfig = useMemo(() => {
-    return brand ? carBrandsData[brand as string] : null;
+  const [apiBrands, setApiBrands] = useState<string[]>([]);
+  const [apiModels, setApiModels] = useState<string[]>([]);
+  const [loadingBrands, setLoadingBrands] = useState(true);
+  const [loadingModels, setLoadingModels] = useState(false);
+
+  // FETCH BRANDS (MAKES) USING NHTSA VPIC API
+  useEffect(() => {
+    async function fetchBrands() {
+      try {
+        const res = await fetch("https://vpic.nhtsa.dot.gov/api/vehicles/GetMakesForVehicleType/car?format=json");
+        const data = await res.json();
+        // Remove duplicados e converte para string
+        const makesArray = data.Results.map((m: any) => m.MakeName).filter(Boolean);
+        const uniqueMakes = Array.from(new Set(makesArray)).sort() as string[];
+        setApiBrands(uniqueMakes);
+      } catch (err) {
+        console.error("Falha ao carregar as marcas", err);
+      } finally {
+        setLoadingBrands(false);
+      }
+    }
+    fetchBrands();
+  }, []);
+
+  // FETCH MODELS FOR SELECTED BRAND
+  useEffect(() => {
+    async function fetchModels() {
+      if (!brand) {
+        setApiModels([]);
+        return;
+      }
+      setLoadingModels(true);
+      try {
+        const res = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMake/${encodeURIComponent(brand)}?format=json`);
+        const data = await res.json();
+        const modelsArray = data.Results.map((m: any) => m.Model_Name).filter(Boolean);
+        const uniqueModels = Array.from(new Set(modelsArray)).sort() as string[];
+        setApiModels(uniqueModels);
+      } catch (err) {
+        console.error("Falha ao carregar os modelos", err);
+      } finally {
+        setLoadingModels(false);
+      }
+    }
+    fetchModels();
   }, [brand]);
 
   if (!isOpen) return null;
@@ -91,34 +134,37 @@ export default function AddVehicleModal({ isOpen, onClose, onSubmit, loading }: 
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-[#14171c] px-3 py-2 rounded-xl border border-white/5 focus-within:border-blue-600 transition-colors">
               <p className="text-[8px] font-black text-blue-500 uppercase">Marca</p>
-              <select required className="bg-transparent w-full text-white outline-none font-bold text-xs uppercase"
+              <select required disabled={loadingBrands} className="bg-transparent w-full text-white outline-none font-bold text-xs uppercase disabled:opacity-30"
                 value={brand} onChange={(e) => { setBrand(e.target.value); setModel(""); setFuel(""); }}>
-                <option value="" className="bg-[#0d0f14]">Selecionar</option>
-                {carBrands.map((b: any) => <option key={String(b)} value={String(b)} className="bg-[#0d0f14]">{String(b)}</option>)}
+                <option value="" className="bg-[#0d0f14]">{loadingBrands ? "A CARREGAR..." : "Selecionar"}</option>
+                {apiBrands.map((b: string) => <option key={b} value={b} className="bg-[#0d0f14]">{b}</option>)}
               </select>
             </div>
 
             <div className="bg-[#14171c] px-3 py-2 rounded-xl border border-white/5 focus-within:border-blue-600 transition-colors">
               <p className="text-[8px] font-black text-blue-500 uppercase">Modelo</p>
-              <select required disabled={!brand} className="bg-transparent w-full text-white outline-none font-bold text-xs uppercase disabled:opacity-30"
+              <select required disabled={!brand || loadingModels} className="bg-transparent w-full text-white outline-none font-bold text-xs uppercase disabled:opacity-30"
                 value={model} onChange={(e) => setModel(e.target.value)}>
-                <option value="" className="bg-[#0d0f14]">Selecionar</option>
-                {brandConfig?.models.map((m: string) => <option key={m} value={m} className="bg-[#0d0f14]">{m}</option>)}
+                <option value="" className="bg-[#0d0f14]">{loadingModels ? "A CARREGAR..." : "Selecionar"}</option>
+                {apiModels.map((m: string) => <option key={m} value={m} className="bg-[#0d0f14]">{m}</option>)}
               </select>
             </div>
 
             <div className="bg-[#14171c] px-3 py-2 rounded-xl border border-white/5 focus-within:border-blue-600 transition-colors">
               <p className="text-[8px] font-black text-blue-500 uppercase">Ano Fabrico</p>
-              <input type="number" min={brandConfig?.startYear || 1980} max={2026} value={year} onChange={(e) => setYear(e.target.value)}
+              <input type="number" min={1980} max={2026} value={year} onChange={(e) => setYear(e.target.value)}
                 className="bg-transparent w-full text-white outline-none font-bold text-xs" />
             </div>
 
             <div className="bg-[#14171c] px-3 py-2 rounded-xl border border-white/5 focus-within:border-blue-600 transition-colors">
               <p className="text-[8px] font-black text-blue-500 uppercase">Motor</p>
-              <select required disabled={!brand} className="bg-transparent w-full text-white outline-none font-bold text-xs uppercase disabled:opacity-30"
+              <select required className="bg-transparent w-full text-white outline-none font-bold text-xs uppercase"
                 value={fuel} onChange={(e) => setFuel(e.target.value)}>
                 <option value="" className="bg-[#0d0f14]">Selecionar</option>
-                {brandConfig?.fuels.map((f: string) => <option key={f} value={f} className="bg-[#0d0f14]">{f}</option>)}
+                <option value="Gasolina" className="bg-[#0d0f14]">Gasolina</option>
+                <option value="Diesel" className="bg-[#0d0f14]">Diesel</option>
+                <option value="Híbrido" className="bg-[#0d0f14]">Híbrido</option>
+                <option value="Elétrico" className="bg-[#0d0f14]">Elétrico</option>
               </select>
             </div>
           </div>
