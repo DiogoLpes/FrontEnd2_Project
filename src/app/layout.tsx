@@ -23,6 +23,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt" className="scroll-smooth">
+      <head>
+        <script defer src="https://cloud.umami.is/script.js" data-website-id="84e3f2dc-43f9-49c9-a617-349effd32974"></script>
+      </head>
       <body className={`${barlow.variable} font-sans bg-[#05070a] text-white min-h-screen flex flex-col`}>
         {/* Camada de grão/ruído para textura de asfalto */}
         <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/asfalt-dark.png')] z-50"></div>
