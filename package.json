@@ -8,7 +8,8 @@
     "build": "next build",
     "postinstall": "prisma generate",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
@@ -26,6 +27,7 @@
     "next": "16.1.6",
     "next-auth": "^4.24.13",
     "pg": "^8.19.0",
+    "playwright": "^1.58.2",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-router-dom": "^7.13.0",
@@ -39,6 +41,7 @@
     "@types/pg": "^8.18.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@playwright/test": "^1.42.1",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",

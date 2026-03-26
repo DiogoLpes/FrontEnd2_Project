@@ -12,8 +12,27 @@ const barlow = Barlow_Condensed({
 });
 
 export const metadata: Metadata = {
-  title: "TS Pneus | Performance & Automotive Care",
-  description: "Especialistas em pneus e mecânica em Olhos de Água.",
+  title: "TS PNEUS | Centro Automotivo e Especialistas em Pneus",
+  description: "Performance e segurança para o seu veículo em Olhos de Água. Serviços de mecânica especializada, troca de pneus e alinhamento profissional.",
+  keywords: ["mecânica", "pneus", "centro automotivo", "Olhos de Água", "reparação auto", "TS Pneus"],
+  authors: [{ name: "TS Pneus Team" }],
+  openGraph: {
+    title: "TS PNEUS | Performance & Automotive Care",
+    description: "Especialistas em pneus e mecânica de alta performance.",
+    url: "https://ts-pneus.com",
+    siteName: "TS Pneus",
+    locale: "pt_PT",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TS PNEUS | Performance & Automotive Care",
+    description: "Especialistas em pneus e mecânica de alta performance.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  }
 };
 
 export default function RootLayout({

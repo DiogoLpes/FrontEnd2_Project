@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Calendar,
   Car,
@@ -10,7 +10,9 @@ import {
   Wrench,
   Search,
   Printer,
-  Euro
+  Euro,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 import Swal, { Toast } from "@/app/lib/swal";
 
@@ -39,11 +41,11 @@ export default function AdminAgendamentos() {
   const [loading, setLoading] = useState(true);
   const [expandedIds, setExpandedIds] = useState<number[]>([]);
 
-  const toggleExpand = (id: number) => {
+  const toggleExpand = useCallback((id: number) => {
     setExpandedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
-  };
+  }, []);
 
-  const fetchServices = async () => {
+  const fetchServices = useCallback(async () => {
     try {
       setLoading(true);
       const res = await fetch("/api/services");
@@ -54,11 +56,11 @@ export default function AdminAgendamentos() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  useEffect(() => { fetchServices(); }, []);
+  useEffect(() => { fetchServices(); }, [fetchServices]);
 
-  const handleDarOrcamento = async (serviceId: number) => {
+  const handleDarOrcamento = useCallback(async (serviceId: number) => {
     const { value: formValues } = await Swal.fire({
       title: 'Proposta de Serviço',
       html: `
@@ -113,9 +115,9 @@ export default function AdminAgendamentos() {
         console.error(err);
       }
     }
-  };
+  }, [fetchServices]);
 
-  const updateStatus = async (id: number, newStatus: string) => {
+  const updateStatus = useCallback(async (id: number, newStatus: string) => {
     try {
       const res = await fetch("/api/services", {
         method: "PATCH",
@@ -130,10 +132,10 @@ export default function AdminAgendamentos() {
     } catch (err) {
       console.error("Erro ao atualizar:", err);
     }
-  };
+  }, [fetchServices]);
 
   // Tipamos o parâmetro 's' como ServiceEntry
-  const handlePrint = (s: ServiceEntry) => {
+  const handlePrint = useCallback((s: ServiceEntry) => {
     const printContent = `
       <div style="font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 40px; color: #111827;">
         
@@ -240,7 +242,7 @@ export default function AdminAgendamentos() {
       win.document.close();
       win.print();
     }
-  };
+  }, []);
 
   return (
     <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
@@ -289,27 +291,31 @@ export default function AdminAgendamentos() {
                       Proprietário: <span className="text-white">{s.vehicle?.user?.name || "Desconhecido"}</span>
                     </p>
                     <div className="mt-4">
-                      {hasLongDescription ? (
+                      {s.description ? (
                         <div className="flex flex-col">
                           <button 
                             onClick={() => toggleExpand(s.id)} 
-                            className="w-max flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 hover:text-blue-400 transition-colors tracking-widest bg-white/5 hover:bg-blue-600/10 px-3 py-1.5 rounded-md"
+                            className="w-max flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 hover:text-blue-400 transition-colors tracking-widest bg-white/5 hover:bg-blue-600/10 px-3 py-1.5 rounded-md group/btn"
                           >
-                            {isExpanded ? "ESCONDER NOTAS DO CLIENTE" : "LER NOTAS DO CLIENTE / SINTOMAS"} 
+                            {isExpanded ? (
+                              <>ESCONDER NOTAS <ChevronUp size={14} className="group-hover/btn:-translate-y-0.5 transition-transform" /></>
+                            ) : (
+                              <>VER NOTAS DO CLIENTE <ChevronDown size={14} className="group-hover/btn:translate-y-0.5 transition-transform" /></>
+                            )} 
                           </button>
                           
                           <div className={`mt-3 overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-                            <div className="p-4 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-[#14171c]/80 bg-blend-soft-light border-l-2 border-blue-600 rounded-r-lg shadow-inner">
-                              <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest mb-2 block">Dito pelo Cliente:</span>
+                            <div className="p-4 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-[#14171c]/80 bg-blend-soft-light border-l-4 border-blue-600 rounded-r-lg shadow-inner">
+                              <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest mb-2 block">Diagnóstico / Sintomas:</span>
                               <p className="text-sm text-slate-300 italic leading-relaxed">
-                                "{s.description}"
+                                {s.description}
                               </p>
                             </div>
                           </div>
                         </div>
                       ) : (
-                         <div className="px-3 py-2 bg-[#14171c]/50 rounded-md border border-white/5 italic text-slate-500 text-xs">
-                           Nenhuma nota adicional preenchida.
+                         <div className="px-3 py-2 bg-[#14171c]/50 rounded-md border border-white/5 italic text-slate-500 text-[10px] uppercase font-bold tracking-tighter">
+                           Sem notas ou sintomas descritos
                          </div>
                       )}
                     </div>
