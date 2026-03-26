@@ -37,7 +37,7 @@ export default async function Page() {
               <Settings className="animate-spin-slow" size={14} /> Especialistas em Pneus e Mecânica
             </div>
             
-            <h1 className="text-6xl md:text-8xl font-black uppercase italic leading-none tracking-tighter mb-6 text-white">
+            <h1 className="text-5xl md:text-8xl font-black uppercase italic leading-none tracking-tighter mb-6 text-white">
               TS <span className="text-blue-600">PNEUS</span> <br />
               <span className="text-transparent border-white/20" style={{ WebkitTextStroke: '1.5px white' }}>PERFORMANCE</span>
             </h1>

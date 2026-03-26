@@ -45,9 +45,6 @@ export default async function ClientesAdminPage() {
             className="bg-transparent border-none outline-none py-1.5 px-3 w-full text-sm text-slate-200"
           />
         </div>
-        <button className="bg-white text-black px-4 py-2 rounded-md text-sm font-medium hover:bg-slate-200 transition-colors w-full md:w-auto">
-          Exportar Lista CSV
-        </button>
       </div>
 
       {/* TABELA DE CLIENTES PREMIUM (Componente Interativo) */}
