@@ -6,7 +6,7 @@ import prisma from "@/app/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
 import { redirect } from "next/navigation";
-import { User, Car, Mail, Calendar, Search, MoreHorizontal } from "lucide-react";
+import { User, Car, Mail, Calendar, Search, MoreHorizontal, Phone } from "lucide-react";
 
 export default async function ClientesAdminPage() {
   const session = await getServerSession(authOptions);
@@ -54,32 +54,46 @@ export default async function ClientesAdminPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
-              <tr className="border-b border-white/10 bg-[#101013] text-slate-400 text-xs font-semibold tracking-wide">
-                <th className="px-6 py-4">Identificação</th>
-                <th className="px-6 py-4">Contacto</th>
-                <th className="px-6 py-4 text-center">Frotas</th>
-                <th className="px-6 py-4 text-center">Serviços</th>
-                <th className="px-6 py-4 text-right">Ações</th>
+              <tr className="border-b border-blue-600/20 bg-[#14171c] text-blue-500 text-[10px] font-black uppercase tracking-widest">
+                <th className="px-6 py-5 rounded-tl-lg">Identificação</th>
+                <th className="px-6 py-5">Telefone</th>
+                <th className="px-6 py-5 text-center">Frotas</th>
+                <th className="px-6 py-5 text-center">Serviços</th>
+                <th className="px-6 py-5 text-right rounded-tr-lg">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {clientes.map((cliente: any) => (
-                <tr key={cliente.id} className="hover:bg-[#101013] transition-colors">
+                <tr key={cliente.id} className="hover:bg-[#14171c] transition-all hover:shadow-[inset_4px_0_0_#2563eb] border-b border-white/5 last:border-0 group">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-full bg-blue-600/10 text-blue-500 flex items-center justify-center text-sm font-semibold">
+                      <div className="h-10 w-10 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-500 flex items-center justify-center text-sm font-black italic shadow-inner group-hover:bg-blue-600/20 transition-colors">
                         {cliente.name?.substring(0, 2)?.toUpperCase() || 'U'}
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-slate-200">{cliente.name || "Sem Nome"}</p>
-                        <p className="text-xs text-slate-500 mt-0.5">ID: {String(cliente.id).substring(0, 8)}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-bold text-slate-200">{cliente.name || "Sem Nome"}</p>
+                          {cliente.role === 'ADMIN' ? (
+                            <span className="bg-red-500/10 text-red-500 border border-red-500/20 text-[9px] px-1.5 py-0.5 rounded font-black uppercase tracking-wider">Staff</span>
+                          ) : (
+                            <span className="bg-blue-500/10 text-blue-500 border border-blue-500/20 text-[9px] px-1.5 py-0.5 rounded font-black uppercase tracking-wider">Cliente</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1.5 mt-1 text-xs text-slate-500">
+                          <Mail size={12} className="text-slate-600" />
+                          {cliente.email}
+                        </div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-slate-400">
+                  <td className="px-6 py-4 text-sm text-slate-300">
                     <div className="flex items-center gap-2">
-                      <Mail size={14} className="text-slate-500" />
-                      {cliente.email}
+                      <Phone size={14} className="text-blue-500" />
+                      {cliente.phone ? (
+                        <span className="font-mono font-medium">{cliente.phone}</span>
+                      ) : (
+                        <span className="text-slate-600 italic text-xs">Sem contacto</span>
+                      )}
                     </div>
                   </td>
                   <td className="px-6 py-4 text-center">
