@@ -10,7 +10,8 @@ import {
   Wrench,
   Search,
   Printer,
-import { Euro } from "lucide-react";
+  Euro
+} from "lucide-react";
 import Swal, { Toast } from "@/app/lib/swal";
 
 // 1. DEFINIÇÃO DE TIPOS (Para o TypeScript não reclamar)
