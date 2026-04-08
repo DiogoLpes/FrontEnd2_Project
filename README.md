@@ -41,14 +41,19 @@ Plataforma premium para gestão de oficina e marcações (Orçamentos, Agendamen
     - **Framer Motion**: Integrações e setups previstos via pacotes.
     - **SweetAlert2 Global**: Avisos costumizados em `src/app/lib/swal.ts`.
 
+12. **Sitemaps / Robots.txt Estruturado:** Expor `/app/sitemap.ts` (ou `robots.txt`) para melhor indexação e Web Crawlers orgânicos.
+
+14. **ContextAPI / React Query:** Gerenciamento escalável de estado caso a aplicação aumente de complexidade fora do âmbito local/próprio das páginas
+
+
 ---
 
 ## 🚦 Roadmap / Em Falta
 
 Os seguintes itens ainda necessitam de implementação ou polimento final:
 
-- [ ] **Sitemaps / Robots.txt Estruturado:** Expor `/app/sitemap.ts` (ou `robots.txt`) para melhor indexação e Web Crawlers orgânicos.
-- [ ] **ContextAPI / React Query:** Gerenciamento escalável de estado caso a aplicação aumente de complexidade fora do âmbito local/próprio das páginas.
+
+
 - [ ] **Integração de Notificações Ativas:** Disparar emails automáticos aquando da aprovação do "Orçamento" ou finalização por via do Next Resend.
 - [ ] **Suite E2E Testing:** Aplicar testes unitários para o frontend (Cypress UI ou Playwright).
 
